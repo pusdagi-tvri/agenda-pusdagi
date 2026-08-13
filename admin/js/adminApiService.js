@@ -41,14 +41,17 @@ function kirimForm(bodyObject) {
 
     // Tidak ada cara membaca hasil sungguhan — beri jeda agar Apps Script
     // sempat memproses, baru anggap selesai (pemanggil akan refresh data sendiri).
-    setTimeout(resolve, 1500);
+    setTimeout(resolve, 900);
   });
 }
 
 async function permintaan(path, opsi) {
   opsi = opsi || {};
   const pemisah = path.includes('?') ? '&' : '?';
-  const url = `${CONFIG.API_BASE_URL}${path}${pemisah}key=${encodeURIComponent(AdminAuth.ambilToken())}`;
+  // Cache-busting penting setelah operasi tulis agar /dashboard tidak
+  // mengembalikan snapshot lama dari cache browser/CDN.
+  const nonce = Date.now();
+  const url = `${CONFIG.API_BASE_URL}${path}${pemisah}key=${encodeURIComponent(AdminAuth.ambilToken())}&_=${nonce}`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);
@@ -57,7 +60,8 @@ async function permintaan(path, opsi) {
     const response = await fetch(url, {
       method: opsi.method || 'GET',
       body: opsi.body ? JSON.stringify(opsi.body) : undefined,
-      signal: controller.signal
+      signal: controller.signal,
+      cache: 'no-store'
     });
     const json = await response.json();
 
@@ -71,6 +75,37 @@ async function permintaan(path, opsi) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+
+function nilaiSama(a, b) {
+  return String(a == null ? '' : a).trim() === String(b == null ? '' : b).trim();
+}
+
+function agendaCocokDenganPayload(agenda, payload) {
+  if (!agenda) return false;
+  const fields = [
+    'judul_kegiatan', 'tanggal', 'tanggal_selesai', 'jam_mulai', 'jam_selesai',
+    'id_pimpinan', 'id_ruangan', 'kategori', 'prioritas', 'peserta',
+    'penyelenggara', 'catatan', 'notulen'
+  ];
+  return fields.every(field => !(field in payload) || nilaiSama(agenda[field], payload[field]));
+}
+
+async function tungguUpdateTerverifikasi(idAgenda, payload, opsi) {
+  opsi = opsi || {};
+  const maksimumPercobaan = opsi.maksimumPercobaan || 10;
+  const jedaMs = opsi.jedaMs || 900;
+
+  for (let i = 0; i < maksimumPercobaan; i++) {
+    if (i > 0) await new Promise(resolve => setTimeout(resolve, jedaMs));
+    const ringkasan = await AdminApiService.ambilRingkasan();
+    const semua = [...ringkasan.agenda, ...ringkasan.arsip];
+    const agenda = semua.find(a => nilaiSama(a.id_agenda, idAgenda));
+    if (agendaCocokDenganPayload(agenda, payload)) return ringkasan;
+  }
+
+  throw new Error('Perubahan belum terkonfirmasi di server. Data lama tetap dipertahankan di form agar dapat dicoba kembali.');
 }
 
 export const AdminApiService = {
@@ -102,6 +137,10 @@ export const AdminApiService = {
 
   updateAgenda(idAgenda, payload) {
     return kirimForm({ action: 'updateAgenda', id_agenda: idAgenda, payload });
+  },
+
+  tungguUpdateTerverifikasi(idAgenda, payload, opsi) {
+    return tungguUpdateTerverifikasi(idAgenda, payload, opsi);
   },
 
   batalkanAgenda(idAgenda, alasan) {
