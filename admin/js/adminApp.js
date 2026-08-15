@@ -64,13 +64,27 @@ async function tanganiSubmitForm(e) {
   // memastikan agenda benar-benar tersimpan sesuai yang diharapkan.
 }
 
+let arsipLengkap = []; // disimpan supaya pencarian bisa filter tanpa fetch ulang ke server
+
 /** Satu panggilan (/dashboard) untuk mengisi dropdown pimpinan/ruangan, daftar agenda, dan arsip rapat. */
 async function muatData() {
   const { pimpinan, ruangan, agenda, arsip } = await AdminApiService.ambilRingkasan();
   AdminRenderer.isiDatalist('datalist-pimpinan', pimpinan, 'nama_lengkap');
   AdminRenderer.isiDatalist('datalist-ruangan', ruangan, 'nama_ruangan');
   AdminRenderer.renderDaftarAgenda(agenda, mulaiEdit, batalkanAgenda);
-  AdminRenderer.renderArsip(arsip, mulaiEdit); // pakai form yang sama — isi notulen lewat alur edit biasa
+
+  arsipLengkap = arsip;
+  terapkanPencarianArsip(); // supaya kata kunci yang sudah diketik tetap berlaku setelah refresh data
+}
+
+/** Filter arsip berdasarkan kata kunci di kolom judul, tanggal, penyelenggara, atau peserta. */
+function terapkanPencarianArsip() {
+  const kataKunci = (document.getElementById('cari-arsip').value || '').trim().toLowerCase();
+  const hasil = !kataKunci ? arsipLengkap : arsipLengkap.filter(a => {
+    const gabungan = [a.judul_kegiatan, a.tanggal, a.penyelenggara, a.peserta].join(' ').toLowerCase();
+    return gabungan.includes(kataKunci);
+  });
+  AdminRenderer.renderArsip(hasil, mulaiEdit); // pakai form yang sama — isi notulen lewat alur edit biasa
 }
 
 async function bukaPanel() {
@@ -109,6 +123,7 @@ function init() {
   document.getElementById('form-agenda').addEventListener('submit', tanganiSubmitForm);
   document.getElementById('tombol-reset-form').addEventListener('click', () => AdminRenderer.resetForm());
   document.getElementById('tombol-logout').addEventListener('click', tanganiLogout);
+  document.getElementById('cari-arsip').addEventListener('input', terapkanPencarianArsip);
 
   if (AdminAuth.sudahLogin()) {
     bukaPanel();
