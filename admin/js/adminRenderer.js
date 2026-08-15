@@ -10,6 +10,13 @@ const $ = (id) => document.getElementById(id);
 const PETA_ESCAPE = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const escapeHTML = (nilai) => (nilai === null || nilai === undefined ? '' : String(nilai).replace(/[&<>"']/g, c => PETA_ESCAPE[c]));
 
+/** Mengubah 'yyyy-mm-dd' jadi 'dd-mm-yyyy'. Mengembalikan apa adanya kalau formatnya tidak dikenali. */
+function formatTanggalID(isoStr) {
+  const bagian = (isoStr || '').split('-');
+  if (bagian.length !== 3) return isoStr || '';
+  return `${bagian[2]}-${bagian[1]}-${bagian[0]}`;
+}
+
 export const AdminRenderer = {
 
   tampilkanLogin() {
@@ -38,9 +45,9 @@ export const AdminRenderer = {
     daftar.forEach(a => {
       const tr = document.createElement('tr');
       tr.className = 'border-b border-white/[0.06]';
-      const rentang = (a.tanggal_selesai && a.tanggal_selesai !== a.tanggal) ? ` s/d ${a.tanggal_selesai}` : '';
+      const rentang = (a.tanggal_selesai && a.tanggal_selesai !== a.tanggal) ? ` s/d ${formatTanggalID(a.tanggal_selesai)}` : '';
       tr.innerHTML = `
-        <td class="py-3 px-3 whitespace-nowrap">${a.tanggal}${rentang}</td>
+        <td class="py-3 px-3 whitespace-nowrap">${formatTanggalID(a.tanggal)}${rentang}</td>
         <td class="py-3 px-3">${a.jam_mulai}–${a.jam_selesai}</td>
         <td class="py-3 px-3">${escapeHTML(a.judul_kegiatan)}</td>
         <td class="py-3 px-3"><span class="badge-status badge-info">${escapeHTML(a.status)}</span></td>
@@ -136,7 +143,7 @@ export const AdminRenderer = {
       const tr = document.createElement('tr');
       tr.className = 'border-b border-white/[0.06]';
       tr.innerHTML = `
-        <td class="py-3 px-3 whitespace-nowrap">${a.tanggal}</td>
+        <td class="py-3 px-3 whitespace-nowrap">${formatTanggalID(a.tanggal)}</td>
         <td class="py-3 px-3">${escapeHTML(a.judul_kegiatan)}</td>
         <td class="py-3 px-3">${escapeHTML(a.penyelenggara) || '-'}</td>
         <td class="py-3 px-3 max-w-[220px]">${previewNotulen}</td>

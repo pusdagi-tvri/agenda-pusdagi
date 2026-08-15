@@ -41,7 +41,9 @@ function kirimForm(bodyObject) {
 
     // Tidak ada cara membaca hasil sungguhan — beri jeda agar Apps Script
     // sempat memproses, baru anggap selesai (pemanggil akan refresh data sendiri).
-    setTimeout(resolve, 1500);
+    // 3 detik (bukan 1.5) — penulisan ke spreadsheet kadang butuh waktu lebih lama
+    // dari perkiraan awal, dan refresh yang terlalu cepat menampilkan data basi.
+    setTimeout(resolve, 3000);
   });
 }
 

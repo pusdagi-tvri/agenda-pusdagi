@@ -38,6 +38,9 @@ function batalkanAgenda(agenda) {
     AdminRenderer.tampilkanPesan('sukses', 'Permintaan pembatalan dikirim, memuat ulang daftar…');
     await AdminApiService.batalkanAgenda(agenda.id_agenda, alasan);
     await muatData();
+    // Refresh kedua sebagai pengaman — kalau refresh pertama masih terlalu cepat
+    // (penulisan di Apps Script belum benar-benar selesai), yang kedua ini menangkapnya.
+    setTimeout(muatData, 3000);
   }
 
   tombolKonfirmasi.addEventListener('click', konfirmasi);
