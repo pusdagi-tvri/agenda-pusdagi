@@ -257,11 +257,13 @@ export const AgendaRenderer = {
 
     const kartu = daftar.map((a) => {
       const prioritas = a.prioritas || 'Sedang';
+      const multiHari = a.tanggal_selesai && a.tanggal_selesai !== a.tanggal;
       return `
         <div class="flex-1 min-w-0 rounded-2xl bg-white/[0.03] border border-white/10 p-4 flex flex-col">
           <div class="flex items-center gap-2 mb-2">
             <span class="w-2 h-2 rounded-full shrink-0" style="background:${DOT_PRIORITAS[prioritas] || '#94A3B8'}"></span>
             <span class="text-[13px] font-medium truncate" style="color:${DOT_PRIORITAS[prioritas] || '#94A3B8'}">${labelHariRelatif(a.tanggal, now)}</span>
+            ${multiHari ? `<span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0" style="background:rgba(139,92,246,0.15); color:#A78BFA;">s/d ${formatTanggalSingkat(a.tanggal_selesai)}</span>` : ''}
           </div>
           <h3 class="text-[17px] font-semibold text-[#F8FAFC] truncate">${escapeHTML(a.judul_kegiatan)}</h3>
           ${a.penyelenggara ? `<p class="text-[13px] text-[#94A3B8] truncate mt-0.5">Penyelenggara: ${escapeHTML(a.penyelenggara)}</p>` : ''}
