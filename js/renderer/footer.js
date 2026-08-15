@@ -20,7 +20,7 @@ export const FooterRenderer = {
     const berlangsung = cariAgendaBerlangsung(daftarAgenda, now);
     const [berikutnya] = cariAgendaBerikutnya(daftarAgenda, now, 1);
 
-    const bagian = ['Selamat datang di TVRI — Pusat Data dan Strategi'];
+    const bagian = ['Selamat datang di Pusat Data dan Strategi Lembaga Penyiaran Publik Televisi Republik Indonesia'];
     if (berlangsung) bagian.push(`${berlangsung.judul_kegiatan} sedang berlangsung di ${berlangsung.ruanganTampilan || 'lokasi terjadwal'}`);
     if (berikutnya) bagian.push(`Agenda berikutnya: ${berikutnya.judul_kegiatan} pukul ${berikutnya.jam_mulai}`);
 
