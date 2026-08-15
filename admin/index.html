@@ -244,11 +244,12 @@
     <!-- ARSIP RAPAT -->
     <section class="card-premium rounded-2xl p-6">
       <h2 class="text-subheading text-lg mb-1">Arsip Rapat</h2>
-      <p class="text-caption normal-case tracking-normal text-[13px] mb-4">Rapat yang sudah lewat — klik "Isi/Edit Notulen" untuk mencatat hasil rapat.</p>
-      <div class="overflow-x-auto">
+      <p class="text-caption normal-case tracking-normal text-[13px] mb-3">Rapat yang sudah lewat — klik "Isi/Edit Notulen" untuk mencatat hasil rapat.</p>
+      <input id="cari-arsip" type="text" placeholder="Cari berdasarkan judul, tanggal, penyelenggara, atau peserta…" class="mb-4" />
+      <div id="wrapper-tabel-arsip" class="overflow-x-auto overflow-y-auto" style="max-height:420px;">
         <table class="w-full text-sm">
           <thead>
-            <tr class="text-caption normal-case tracking-normal text-left border-b border-white/10">
+            <tr class="text-caption normal-case tracking-normal text-left border-b border-white/10" style="position:sticky; top:0; background:#1E293B;">
               <th class="py-2 px-3">Tanggal</th>
               <th class="py-2 px-3">Judul</th>
               <th class="py-2 px-3">Penyelenggara</th>
