@@ -271,6 +271,21 @@
 
   </div>
 
+  <!-- MODAL KONFIRMASI BATALKAN — pengganti prompt() bawaan browser, karena prompt() sering
+       diblokir/tidak muncul di banyak browser mobile atau konteks tampilan tertentu. -->
+  <div id="modal-batalkan" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4" style="background:rgba(0,0,0,0.6);">
+    <div class="card-premium-glass rounded-2xl p-6 w-full max-w-sm">
+      <h3 class="text-heading text-lg mb-1">Batalkan Agenda</h3>
+      <p id="modal-batalkan-judul" class="text-caption normal-case tracking-normal text-[13px] mb-4"></p>
+      <label for="modal-batalkan-alasan">Alasan pembatalan</label>
+      <textarea id="modal-batalkan-alasan" rows="3" placeholder="mis. Pimpinan berhalangan hadir"></textarea>
+      <div class="flex gap-3 mt-5">
+        <button id="modal-batalkan-konfirmasi" type="button" class="btn-gradient-premium px-5 py-2 text-sm">Ya, Batalkan</button>
+        <button id="modal-batalkan-tutup" type="button" class="px-5 py-2 rounded-full border border-white/10 text-[#94A3B8] hover-brighten text-sm">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Target form submission untuk operasi tulis — form HTML biasa tidak tunduk CORS,
        beda dari fetch(). Lihat adminApiService.js: kirimForm(). -->
   <iframe name="admin-write-target" style="display:none"></iframe>
