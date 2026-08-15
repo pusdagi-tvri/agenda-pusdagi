@@ -105,7 +105,6 @@ function tanganiLogout() {
 }
 
 function init() {
-  AdminRenderer.inisialisasiDropdownTanggal();
   document.getElementById('form-login').addEventListener('submit', tanganiSubmitLogin);
   document.getElementById('form-agenda').addEventListener('submit', tanganiSubmitForm);
   document.getElementById('tombol-reset-form').addEventListener('click', () => AdminRenderer.resetForm());

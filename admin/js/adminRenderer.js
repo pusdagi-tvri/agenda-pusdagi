@@ -10,49 +10,7 @@ const $ = (id) => document.getElementById(id);
 const PETA_ESCAPE = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const escapeHTML = (nilai) => (nilai === null || nilai === undefined ? '' : String(nilai).replace(/[&<>"']/g, c => PETA_ESCAPE[c]));
 
-const NAMA_BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-
-/** Mengisi 3 dropdown (hari/bulan/tahun) untuk satu field tanggal. wajib=false artinya boleh dibiarkan kosong (Tanggal Selesai). */
-function isiDropdownTanggal(prefix, wajib) {
-  const selHari = $(`${prefix}-hari`);
-  const selBulan = $(`${prefix}-bulan`);
-  const selTahun = $(`${prefix}-tahun`);
-  const kosong = wajib ? '' : '<option value="">-</option>';
-
-  selHari.innerHTML = kosong + Array.from({ length: 31 }, (_, i) => i + 1)
-    .map(h => `<option value="${String(h).padStart(2, '0')}">${h}</option>`).join('');
-
-  selBulan.innerHTML = kosong + NAMA_BULAN
-    .map((nama, i) => `<option value="${String(i + 1).padStart(2, '0')}">${nama}</option>`).join('');
-
-  const tahunSekarang = new Date().getFullYear();
-  selTahun.innerHTML = kosong + Array.from({ length: 6 }, (_, i) => tahunSekarang - 1 + i)
-    .map(t => `<option value="${t}">${t}</option>`).join('');
-}
-
-/** Menggabungkan 3 dropdown jadi string ISO 'yyyy-mm-dd'. Kembalikan '' kalau ada yang belum dipilih (dan wajib=false). */
-function gabungTanggal(prefix) {
-  const hari = $(`${prefix}-hari`).value;
-  const bulan = $(`${prefix}-bulan`).value;
-  const tahun = $(`${prefix}-tahun`).value;
-  if (!hari || !bulan || !tahun) return '';
-  return `${tahun}-${bulan}-${hari}`;
-}
-
-/** Mengisi 3 dropdown dari string ISO 'yyyy-mm-dd'. Kosongkan semua kalau isoStr kosong/tidak valid. */
-function pecahTanggal(prefix, isoStr) {
-  const bagian = (isoStr || '').split('-');
-  $(`${prefix}-tahun`).value = bagian[0] || '';
-  $(`${prefix}-bulan`).value = bagian[1] || '';
-  $(`${prefix}-hari`).value = bagian[2] || '';
-}
-
 export const AdminRenderer = {
-  /** Dipanggil sekali saat halaman dimuat — mengisi opsi dropdown hari/bulan/tahun. */
-  inisialisasiDropdownTanggal() {
-    isiDropdownTanggal('form-tanggal', true);
-    isiDropdownTanggal('form-tanggal-selesai', false);
-  },
 
   tampilkanLogin() {
     $('layar-login').classList.remove('hidden');
@@ -114,10 +72,10 @@ export const AdminRenderer = {
   isiFormUntukEdit(agenda) {
     $('form-id-agenda').value = agenda.id_agenda;
     $('form-judul').value = agenda.judul_kegiatan;
-    pecahTanggal('form-tanggal', agenda.tanggal);
+    $('form-tanggal').value = agenda.tanggal;
     // Tampilkan kosong kalau sama dengan Tanggal Mulai (berarti agenda 1 hari biasa) —
     // supaya form tidak "terlihat" seperti multi-hari padahal bukan.
-    pecahTanggal('form-tanggal-selesai', (agenda.tanggal_selesai && agenda.tanggal_selesai !== agenda.tanggal) ? agenda.tanggal_selesai : '');
+    $('form-tanggal-selesai').value = (agenda.tanggal_selesai && agenda.tanggal_selesai !== agenda.tanggal) ? agenda.tanggal_selesai : '';
     $('form-jam-mulai').value = agenda.jam_mulai;
     $('form-jam-selesai').value = agenda.jam_selesai;
     $('form-pimpinan').value = agenda.id_pimpinan || '';
@@ -135,15 +93,13 @@ export const AdminRenderer = {
   resetForm() {
     $('form-agenda').reset();
     $('form-id-agenda').value = '';
-    pecahTanggal('form-tanggal', '');
-    pecahTanggal('form-tanggal-selesai', '');
     $('form-judul-panel').textContent = 'Tambah Agenda Baru';
     $('form-tombol-submit').textContent = 'Simpan Agenda';
   },
 
   ambilDataForm() {
-    const tanggalMulai = gabungTanggal('form-tanggal');
-    const tanggalSelesaiDiisi = gabungTanggal('form-tanggal-selesai');
+    const tanggalMulai = $('form-tanggal').value;
+    const tanggalSelesaiDiisi = $('form-tanggal-selesai').value;
     return {
       id_agenda: $('form-id-agenda').value || null,
       judul_kegiatan: $('form-judul').value.trim(),
