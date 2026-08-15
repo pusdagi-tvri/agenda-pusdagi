@@ -35,97 +35,6 @@
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .form-divider { height: 1px; background: rgba(255,255,255,0.07); }
-
-
-  /* ===== CUSTOM DATE PICKER ===== */
-  .native-date-selects{ display:none !important; }
-  .date-picker-wrap{ position:relative; }
-  .date-picker-trigger{
-    width:100%; min-height:42px; display:flex; align-items:center; justify-content:space-between;
-    gap:10px; padding:10px 14px; border-radius:12px;
-    background:#1E293B; border:1px solid rgba(255,255,255,.10); color:#F8FAFC;
-    cursor:pointer; transition:border-color .2s ease, background .2s ease, box-shadow .2s ease;
-  }
-  .date-picker-trigger:hover{ border-color:rgba(255,255,255,.18); }
-  .date-picker-trigger:focus{ outline:none; border-color:#2563EB; box-shadow:0 0 0 2px rgba(37,99,235,.28); background:#24334A; }
-  .date-picker-trigger .date-placeholder{ color:#64748B; }
-  .date-picker-trigger svg{ flex:0 0 auto; color:#94A3B8; }
-
-  .date-picker-popover{
-    position:absolute; z-index:9999; top:calc(100% + 8px); left:0; width:320px;
-    padding:14px; border-radius:14px; background:#151D31;
-    border:1px solid rgba(148,163,184,.18); box-shadow:0 22px 55px rgba(2,6,23,.55);
-    display:none; user-select:none;
-  }
-  .date-picker-popover.open{ display:block; }
-  .date-picker-head{ display:grid; grid-template-columns:34px 1fr 34px; align-items:center; gap:8px; margin-bottom:12px; }
-  .date-picker-title{ display:flex; align-items:center; justify-content:center; gap:8px; font-size:20px; font-weight:700; color:#F8FAFC; }
-  .date-picker-title select{
-    width:auto; padding:3px 22px 3px 4px; min-height:auto; border:0; background:transparent; color:#F8FAFC;
-    font-size:20px; font-weight:700; border-radius:8px; outline:none;
-  }
-  .date-picker-title select:focus{ outline:none; background:rgba(255,255,255,.05); }
-  .date-picker-title select{
-    color-scheme:dark;
-    background:#202A40;
-    border:1px solid rgba(148,163,184,.18);
-    padding:4px 28px 4px 10px;
-  }
-  .date-picker-title select option{
-    background:#151D31 !important;
-    color:#F8FAFC !important;
-  }
-  .date-picker-title select option:checked{
-    background:#2563EB !important;
-    color:#FFFFFF !important;
-  }
-  .date-nav{ width:34px; height:34px; border:0; border-radius:9px; display:flex; align-items:center; justify-content:center; background:transparent; color:#94A3B8; cursor:pointer; }
-  .date-nav:hover{ background:rgba(255,255,255,.06); color:#F8FAFC; }
-  .date-weekdays,.date-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
-  .date-weekdays{ margin-bottom:4px; }
-  .date-weekdays span{ text-align:center; color:#8B95AA; font-weight:700; font-size:12px; padding:5px 0; }
-  .date-day{
-    height:38px; border:0; border-radius:50%; background:transparent; color:#E5E7EB; font-size:14px; font-weight:600;
-    cursor:pointer; display:flex; align-items:center; justify-content:center; position:relative;
-  }
-  .date-day:hover{ background:rgba(255,255,255,.07); }
-  .date-day.muted{ color:#667085; }
-  .date-day.today{ box-shadow:inset 0 0 0 1px #EF4444; color:#fff; }
-  .date-day.selected{ background:#E53935; color:#fff; box-shadow:none; }
-  .date-day.selected.today{ box-shadow:none; }
-  .date-picker-actions{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(148,163,184,.12); }
-  .date-action{ border:0; background:transparent; color:#93C5FD; font-size:12px; font-weight:600; cursor:pointer; padding:6px 8px; border-radius:8px; }
-  .date-action:hover{ background:rgba(37,99,235,.12); }
-  .date-action.clear{ color:#94A3B8; }
-  @media (max-width:640px){ .date-picker-popover{ width:min(320px, calc(100vw - 48px)); } }
-
-
-  /* Custom kategori dropdown: pilihan tetap + tetap bisa diketik manual */
-  .kategori-combobox { position: relative; }
-  .kategori-input-wrap { position: relative; }
-  .kategori-input-wrap #form-kategori { padding-right: 44px; }
-  .kategori-toggle {
-    position:absolute; right:6px; top:50%; transform:translateY(-50%);
-    width:32px; height:32px; border-radius:8px; border:0;
-    background:transparent; color:#94A3B8; font-size:20px; line-height:1; cursor:pointer;
-  }
-  .kategori-toggle:hover { background:rgba(255,255,255,.07); color:#F8FAFC; }
-  .kategori-menu {
-    position:absolute; z-index:80; left:0; right:0; top:calc(100% + 7px);
-    background:#172033; border:1px solid rgba(255,255,255,.12); border-radius:12px;
-    padding:6px; box-shadow:0 18px 40px rgba(0,0,0,.38); overflow:hidden;
-  }
-  .kategori-menu.hidden { display:none; }
-  .kategori-option {
-    width:100%; display:block; text-align:left; padding:10px 12px; border:0; border-radius:8px;
-    background:transparent; color:#E2E8F0; font:inherit; font-size:14px; cursor:pointer;
-  }
-  .kategori-option:hover, .kategori-option.active { background:#24334A; color:#fff; }
-  .kategori-manual-note {
-    margin-top:5px; padding:9px 12px 7px; border-top:1px solid rgba(255,255,255,.07);
-    color:#64748B; font-size:11px;
-  }
-
 </style>
 </head>
 <body class="min-h-screen">
@@ -199,32 +108,18 @@
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label>Tanggal Mulai</label>
-                <div class="date-picker-wrap" data-date-picker="start">
-                  <button type="button" class="date-picker-trigger" aria-label="Pilih tanggal mulai">
-                    <span class="date-display date-placeholder">Pilih tanggal</span>
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
-                  </button>
-                  <div class="date-picker-popover"></div>
-                  <div class="native-date-selects">
-                    <select id="form-tanggal-hari" required></select>
-                    <select id="form-tanggal-bulan" required></select>
-                    <select id="form-tanggal-tahun" required></select>
-                  </div>
+                <div class="grid grid-cols-3 gap-1.5">
+                  <select id="form-tanggal-hari" required></select>
+                  <select id="form-tanggal-bulan" required></select>
+                  <select id="form-tanggal-tahun" required></select>
                 </div>
               </div>
               <div>
                 <label>Tanggal Selesai <span class="text-caption normal-case tracking-normal text-[12px]">(opsional)</span></label>
-                <div class="date-picker-wrap" data-date-picker="end">
-                  <button type="button" class="date-picker-trigger" aria-label="Pilih tanggal selesai">
-                    <span class="date-display date-placeholder">Pilih tanggal</span>
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
-                  </button>
-                  <div class="date-picker-popover"></div>
-                  <div class="native-date-selects">
-                    <select id="form-tanggal-selesai-hari"><option value="">-</option></select>
-                    <select id="form-tanggal-selesai-bulan"><option value="">-</option></select>
-                    <select id="form-tanggal-selesai-tahun"><option value="">-</option></select>
-                  </div>
+                <div class="grid grid-cols-3 gap-1.5">
+                  <select id="form-tanggal-selesai-hari"><option value="">-</option></select>
+                  <select id="form-tanggal-selesai-bulan"><option value="">-</option></select>
+                  <select id="form-tanggal-selesai-tahun"><option value="">-</option></select>
                 </div>
               </div>
             </div>
@@ -264,20 +159,13 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label for="form-kategori">Kategori</label>
-              <div class="kategori-combobox" id="kategori-combobox">
-                <div class="kategori-input-wrap">
-                  <input id="form-kategori" value="Rapat Internal" placeholder="Pilih atau ketik kategori manual" autocomplete="off">
-                  <button type="button" id="kategori-toggle" class="kategori-toggle" aria-label="Buka pilihan kategori">⌄</button>
-                </div>
-                <div id="kategori-menu" class="kategori-menu hidden">
-                  <button type="button" class="kategori-option" data-value="Rapat Internal">Rapat Internal</button>
-                  <button type="button" class="kategori-option" data-value="Rapat Eksternal">Rapat Eksternal</button>
-                  <button type="button" class="kategori-option" data-value="DL dalam kota">DL dalam kota</button>
-                  <button type="button" class="kategori-option" data-value="DL luar kota">DL luar kota</button>
-                  <button type="button" class="kategori-option" data-value="Diklat / Bimtek">Diklat / Bimtek</button>
-                  <div class="kategori-manual-note">Atau ketik kategori lain langsung pada kolom di atas.</div>
-                </div>
-              </div>
+              <input type="text" id="form-kategori" list="datalist-kategori" placeholder="Pilih dari saran atau ketik kategori" value="Rapat Internal" />
+              <datalist id="datalist-kategori">
+                <option value="Rapat Internal"></option>
+                <option value="Rapat Eksternal"></option>
+                <option value="Perjadin"></option>
+                <option value="Diklat"></option>
+              </datalist>
             </div>
             <div>
               <label for="form-prioritas">Prioritas</label>
@@ -388,189 +276,5 @@
   <iframe name="admin-write-target" style="display:none"></iframe>
 
 <script type="module" src="js/adminApp.js"></script>
-
-<script>
-(() => {
-  const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const DAYS = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
-
-  function ids(kind){
-    return kind === 'start'
-      ? ['form-tanggal-hari','form-tanggal-bulan','form-tanggal-tahun']
-      : ['form-tanggal-selesai-hari','form-tanggal-selesai-bulan','form-tanggal-selesai-tahun'];
-  }
-  function els(kind){ return ids(kind).map(id => document.getElementById(id)); }
-  function num(v){ const n=parseInt(v,10); return Number.isFinite(n)?n:null; }
-  function selected(kind){
-    const [d,m,y]=els(kind); if(!d||!m||!y) return null;
-    const dd=num(d.value), mm=num(m.value), yy=num(y.value);
-    if(!dd || mm===null || !yy) return null;
-    // Handle month select whether it stores 1-12 or 0-11
-    let month=mm;
-    const opts=[...m.options].map(o=>num(o.value)).filter(v=>v!==null);
-    if(opts.includes(0) && opts.includes(11)) month=mm+1;
-    if(month<1 || month>12) return null;
-    return {day:dd, month, year:yy};
-  }
-  function setNative(kind, day, month, year){
-    const [d,m,y]=els(kind); if(!d||!m||!y) return;
-    const setSel=(sel,candidates)=>{
-      const vals=[...sel.options].map(o=>o.value);
-      const match=candidates.map(String).find(v=>vals.includes(v));
-      if(match!==undefined) sel.value=match;
-    };
-    setSel(d,[day,String(day).padStart(2,'0')]);
-    // support 1-12 and 0-11 month values
-    const mvals=[...m.options].map(o=>o.value);
-    const hasZero=mvals.includes('0');
-    setSel(m, hasZero?[month-1,String(month-1).padStart(2,'0')]:[month,String(month).padStart(2,'0')]);
-    setSel(y,[year]);
-    [d,m,y].forEach(el=>{ el.dispatchEvent(new Event('change',{bubbles:true})); el.dispatchEvent(new Event('input',{bubbles:true})); });
-  }
-  function clearNative(kind){
-    els(kind).forEach(el=>{ if(el){ el.value=''; el.dispatchEvent(new Event('change',{bubbles:true})); }});
-  }
-  function fmt(o){ return `${String(o.day).padStart(2,'0')} ${MONTHS[o.month-1]} ${o.year}`; }
-  function same(a,b){ return a&&b&&a.day===b.day&&a.month===b.month&&a.year===b.year; }
-  function todayObj(){ const t=new Date(); return {day:t.getDate(),month:t.getMonth()+1,year:t.getFullYear()}; }
-
-  // Default Tanggal Mulai mengikuti tanggal lokal perangkat/sistem.
-  // Dijalankan setelah option select lama selesai dipopulasi oleh adminApp.js.
-  function applySystemDateDefault(){
-    const wrap=document.querySelector('[data-date-picker="start"]');
-    if(!wrap || wrap.dataset.systemDefaultApplied==='1') return false;
-
-    const [d,m,y]=els('start');
-    if(!d||!m||!y || !d.options.length || !m.options.length || !y.options.length) return false;
-
-    const t=todayObj();
-    const dayVals=[...d.options].map(o=>String(o.value));
-    const monthVals=[...m.options].map(o=>String(o.value));
-    const yearVals=[...y.options].map(o=>String(o.value));
-    const hasZero=monthVals.includes('0');
-    const targetMonth=hasZero ? String(t.month-1) : String(t.month);
-
-    if(!dayVals.includes(String(t.day)) ||
-       !monthVals.includes(targetMonth) ||
-       !yearVals.includes(String(t.year))) return false;
-
-    setNative('start',t.day,t.month,t.year);
-    wrap.dataset.systemDefaultApplied='1';
-    return true;
-  }
-
-  // Coba beberapa kali karena adminApp.js mengisi option setelah HTML selesai diparse.
-  [0,80,200,500,1000,1800].forEach(ms=>setTimeout(applySystemDateDefault,ms));
-
-  document.querySelectorAll('[data-date-picker]').forEach(wrap=>{
-    const kind=wrap.dataset.datePicker;
-    const trigger=wrap.querySelector('.date-picker-trigger');
-    const display=wrap.querySelector('.date-display');
-    const pop=wrap.querySelector('.date-picker-popover');
-    let view=new Date();
-
-    function syncDisplay(){
-      const s=selected(kind);
-      if(s){ display.textContent=fmt(s); display.classList.remove('date-placeholder'); }
-      else { display.textContent='Pilih tanggal'; display.classList.add('date-placeholder'); }
-    }
-    function close(){ pop.classList.remove('open'); }
-    function render(){
-      const sel=selected(kind);
-      if(sel && !pop.classList.contains('open')) view=new Date(sel.year,sel.month-1,1);
-      const y=view.getFullYear(), m=view.getMonth();
-      const first=(new Date(y,m,1).getDay()+6)%7; // Monday=0
-      const daysCur=new Date(y,m+1,0).getDate();
-      const daysPrev=new Date(y,m,0).getDate();
-      const years=[]; for(let yy=y-8; yy<=y+8; yy++) years.push(`<option value="${yy}" ${yy===y?'selected':''}>${yy}</option>`);
-      pop.innerHTML=`
-        <div class="date-picker-head">
-          <button type="button" class="date-nav prev" aria-label="Bulan sebelumnya">‹</button>
-          <div class="date-picker-title">
-            <select class="month-select">${MONTHS.map((n,i)=>`<option value="${i}" ${i===m?'selected':''}>${n}</option>`).join('')}</select>
-            <select class="year-select">${years.join('')}</select>
-          </div>
-          <button type="button" class="date-nav next" aria-label="Bulan berikutnya">›</button>
-        </div>
-        <div class="date-weekdays">${DAYS.map(d=>`<span>${d}</span>`).join('')}</div>
-        <div class="date-grid"></div>
-        <div class="date-picker-actions">
-          <button type="button" class="date-action today-btn">Hari ini</button>
-          ${kind==='end'?'<button type="button" class="date-action clear">Kosongkan</button>':''}
-        </div>`;
-      const grid=pop.querySelector('.date-grid');
-      const cells=[];
-      for(let i=first-1;i>=0;i--) cells.push({day:daysPrev-i,month:m===0?12:m,year:m===0?y-1:y,muted:true});
-      for(let d=1;d<=daysCur;d++) cells.push({day:d,month:m+1,year:y,muted:false});
-      let nd=1; while(cells.length<42){ cells.push({day:nd++,month:m===11?1:m+2,year:m===11?y+1:y,muted:true}); }
-      const td=todayObj();
-      grid.innerHTML=cells.map(c=>{
-        const cls=['date-day', c.muted?'muted':'', same(c,td)?'today':'', same(c,sel)?'selected':''].filter(Boolean).join(' ');
-        return `<button type="button" class="${cls}" data-day="${c.day}" data-month="${c.month}" data-year="${c.year}">${c.day}</button>`;
-      }).join('');
-      pop.querySelector('.prev').onclick=()=>{ view=new Date(y,m-1,1); render(); };
-      pop.querySelector('.next').onclick=()=>{ view=new Date(y,m+1,1); render(); };
-      pop.querySelector('.month-select').onchange=e=>{ view=new Date(y,+e.target.value,1); render(); };
-      pop.querySelector('.year-select').onchange=e=>{ view=new Date(+e.target.value,m,1); render(); };
-      grid.querySelectorAll('.date-day').forEach(btn=>btn.onclick=()=>{
-        setNative(kind,+btn.dataset.day,+btn.dataset.month,+btn.dataset.year); syncDisplay(); close();
-      });
-      pop.querySelector('.today-btn').onclick=()=>{ const t=todayObj(); setNative(kind,t.day,t.month,t.year); syncDisplay(); close(); };
-      const clear=pop.querySelector('.clear'); if(clear) clear.onclick=()=>{ clearNative(kind); syncDisplay(); close(); };
-    }
-    trigger.addEventListener('click',e=>{
-      e.stopPropagation();
-      document.querySelectorAll('.date-picker-popover.open').forEach(x=>{ if(x!==pop) x.classList.remove('open'); });
-      const s=selected(kind), t=todayObj(); view=new Date((s||t).year,(s||t).month-1,1); render(); pop.classList.toggle('open');
-    });
-    pop.addEventListener('click',e=>e.stopPropagation());
-    document.addEventListener('click',close);
-    setInterval(syncDisplay,350);
-    syncDisplay();
-  });
-})();
-</script>
-
-
-<script>
-(function(){
-  const input = document.getElementById('form-kategori');
-  const toggle = document.getElementById('kategori-toggle');
-  const menu = document.getElementById('kategori-menu');
-  if (!input || !toggle || !menu) return;
-  const options = Array.from(menu.querySelectorAll('.kategori-option'));
-
-  function openMenu(){ menu.classList.remove('hidden'); }
-  function closeMenu(){ menu.classList.add('hidden'); }
-  function toggleMenu(){ menu.classList.contains('hidden') ? openMenu() : closeMenu(); }
-
-  toggle.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); toggleMenu(); });
-  input.addEventListener('focus', openMenu);
-  input.addEventListener('click', openMenu);
-  input.addEventListener('input', function(){
-    const q = input.value.trim().toLowerCase();
-    options.forEach(function(btn){
-      const show = !q || btn.dataset.value.toLowerCase().includes(q);
-      btn.style.display = show ? 'block' : 'none';
-    });
-    openMenu();
-  });
-  options.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      input.value = btn.dataset.value;
-      input.dispatchEvent(new Event('input', {bubbles:true}));
-      input.dispatchEvent(new Event('change', {bubbles:true}));
-      options.forEach(function(o){ o.style.display='block'; });
-      closeMenu();
-      input.focus();
-    });
-  });
-  document.addEventListener('click', function(e){
-    if (!document.getElementById('kategori-combobox').contains(e.target)) closeMenu();
-  });
-  input.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeMenu(); });
-})();
-</script>
-
 </body>
 </html>
