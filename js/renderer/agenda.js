@@ -27,6 +27,33 @@ function formatTanggalSingkat(tanggalStr) {
   return `${tgl} ${BULAN_SINGKAT[bulan - 1]}`;
 }
 
+/** Tambah N hari ke string tanggal ISO 'yyyy-mm-dd', kembalikan ISO baru. */
+function tambahHari(tanggalStr, jumlahHari) {
+  const [t, b, h] = tanggalStr.split('-').map(Number);
+  const d = new Date(t, b - 1, h + jumlahHari);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * Memecah satu agenda multi-hari jadi beberapa "salinan" — satu per hari, judul dan
+ * detail lain sama persis, cuma tanggalnya beda — supaya di Agenda Mendatang tampil
+ * sebagai kartu terpisah per hari (bukan satu kartu dengan badge "s/d ..."). Dibatasi
+ * maksimal 7 hari per agenda, dan tidak melewati batasAkhir (ujung jendela 7 hari ke depan).
+ */
+function pecahAgendaMultiHari(agenda, batasAkhirISO) {
+  const multiHari = agenda.tanggal_selesai && agenda.tanggal_selesai !== agenda.tanggal;
+  if (!multiHari) return [agenda];
+
+  const hasil = [];
+  let tglBerjalan = agenda.tanggal;
+  for (let i = 0; i < 7; i++) {
+    if (tglBerjalan > agenda.tanggal_selesai || tglBerjalan >= batasAkhirISO) break;
+    hasil.push({ ...agenda, tanggal: tglBerjalan });
+    tglBerjalan = tambahHari(tglBerjalan, 1);
+  }
+  return hasil;
+}
+
 const WARNA_STATUS_HEX = {
   [STATUS_OTOMATIS.BELUM_DIMULAI]: '#2563EB',
   [STATUS_OTOMATIS.BERLANGSUNG]: '#F59E0B',
@@ -238,7 +265,9 @@ export const AgendaRenderer = {
     if (skeleton) skeleton.classList.add('hidden');
     content.classList.remove('hidden');
 
-    const daftar = hitungAgendaMendatang7Hari(daftarAgendaMendatang, now).slice(0, 5);
+    const belumDipecah = hitungAgendaMendatang7Hari(daftarAgendaMendatang, now);
+    const batasAkhirISO = tambahHari(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`, 7);
+    const daftar = belumDipecah.flatMap((a) => pecahAgendaMultiHari(a, batasAkhirISO)).slice(0, 5);
 
     if (!daftar.length) {
       if (content.dataset.signature !== '') {
@@ -248,7 +277,7 @@ export const AgendaRenderer = {
       return;
     }
 
-    const signature = daftar.map((a) => a.id_agenda).join(',');
+    const signature = daftar.map((a) => `${a.id_agenda}:${a.tanggal}`).join(',');
     if (content.dataset.signature === signature) return;
     content.dataset.signature = signature;
 
@@ -257,13 +286,11 @@ export const AgendaRenderer = {
 
     const kartu = daftar.map((a) => {
       const prioritas = a.prioritas || 'Sedang';
-      const multiHari = a.tanggal_selesai && a.tanggal_selesai !== a.tanggal;
       return `
         <div class="flex-1 min-w-0 rounded-2xl bg-white/[0.03] border border-white/10 p-4 flex flex-col">
           <div class="flex items-center gap-2 mb-2">
             <span class="w-2 h-2 rounded-full shrink-0" style="background:${DOT_PRIORITAS[prioritas] || '#94A3B8'}"></span>
             <span class="text-[13px] font-medium truncate" style="color:${DOT_PRIORITAS[prioritas] || '#94A3B8'}">${labelHariRelatif(a.tanggal, now)}</span>
-            ${multiHari ? `<span class="text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0" style="background:rgba(139,92,246,0.15); color:#A78BFA;">s/d ${formatTanggalSingkat(a.tanggal_selesai)}</span>` : ''}
           </div>
           <h3 class="text-[17px] font-semibold text-[#F8FAFC] truncate">${escapeHTML(a.judul_kegiatan)}</h3>
           ${a.penyelenggara ? `<p class="text-[13px] text-[#94A3B8] truncate mt-0.5">Penyelenggara: ${escapeHTML(a.penyelenggara)}</p>` : ''}
