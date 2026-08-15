@@ -107,20 +107,12 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label>Tanggal Mulai</label>
-                <div class="grid grid-cols-3 gap-1.5">
-                  <select id="form-tanggal-hari" required></select>
-                  <select id="form-tanggal-bulan" required></select>
-                  <select id="form-tanggal-tahun" required></select>
-                </div>
+                <label for="form-tanggal">Tanggal Mulai</label>
+                <input id="form-tanggal" type="date" required />
               </div>
               <div>
-                <label>Tanggal Selesai <span class="text-caption normal-case tracking-normal text-[12px]">(opsional)</span></label>
-                <div class="grid grid-cols-3 gap-1.5">
-                  <select id="form-tanggal-selesai-hari"><option value="">-</option></select>
-                  <select id="form-tanggal-selesai-bulan"><option value="">-</option></select>
-                  <select id="form-tanggal-selesai-tahun"><option value="">-</option></select>
-                </div>
+                <label for="form-tanggal-selesai">Tanggal Selesai <span class="text-caption normal-case tracking-normal text-[12px]">(opsional)</span></label>
+                <input id="form-tanggal-selesai" type="date" />
               </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
