@@ -14,13 +14,34 @@ function mulaiEdit(agenda) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-async function batalkanAgenda(agenda) {
-  const alasan = prompt(`Alasan pembatalan "${agenda.judul_kegiatan}"?`);
-  if (alasan === null) return; // admin menekan Cancel pada dialog
+/** Membuka modal kustom untuk minta alasan pembatalan — bukan prompt() bawaan browser,
+ *  karena prompt() sering diblokir/tidak muncul di banyak browser mobile. */
+function batalkanAgenda(agenda) {
+  const modal = document.getElementById('modal-batalkan');
+  const inputAlasan = document.getElementById('modal-batalkan-alasan');
+  document.getElementById('modal-batalkan-judul').textContent = `"${agenda.judul_kegiatan}"`;
+  inputAlasan.value = '';
+  modal.classList.remove('hidden');
 
-  AdminRenderer.tampilkanPesan('sukses', 'Permintaan pembatalan dikirim, memuat ulang daftar…');
-  await AdminApiService.batalkanAgenda(agenda.id_agenda, alasan);
-  await muatData();
+  const tombolKonfirmasi = document.getElementById('modal-batalkan-konfirmasi');
+  const tombolTutup = document.getElementById('modal-batalkan-tutup');
+
+  function tutup() {
+    modal.classList.add('hidden');
+    tombolKonfirmasi.removeEventListener('click', konfirmasi);
+    tombolTutup.removeEventListener('click', tutup);
+  }
+
+  async function konfirmasi() {
+    const alasan = inputAlasan.value.trim();
+    tutup();
+    AdminRenderer.tampilkanPesan('sukses', 'Permintaan pembatalan dikirim, memuat ulang daftar…');
+    await AdminApiService.batalkanAgenda(agenda.id_agenda, alasan);
+    await muatData();
+  }
+
+  tombolKonfirmasi.addEventListener('click', konfirmasi);
+  tombolTutup.addEventListener('click', tutup);
 }
 
 async function tanganiSubmitForm(e) {
