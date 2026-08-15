@@ -11,7 +11,7 @@ const PETA_ESCAPE = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'"
 const escapeHTML = (nilai) => (nilai === null || nilai === undefined ? '' : String(nilai).replace(/[&<>"']/g, c => PETA_ESCAPE[c]));
 
 /** Mengubah 'yyyy-mm-dd' jadi 'dd-mm-yyyy'. Mengembalikan apa adanya kalau formatnya tidak dikenali. */
-function formatTanggalID(isoStr) {
+export function formatTanggalID(isoStr) {
   const bagian = (isoStr || '').split('-');
   if (bagian.length !== 3) return isoStr || '';
   return `${bagian[2]}-${bagian[1]}-${bagian[0]}`;

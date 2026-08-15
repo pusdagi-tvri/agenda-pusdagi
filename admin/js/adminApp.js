@@ -7,7 +7,7 @@
 
 import { AdminAuth } from './adminAuth.js';
 import { AdminApiService } from './adminApiService.js';
-import { AdminRenderer } from './adminRenderer.js';
+import { AdminRenderer, formatTanggalID } from './adminRenderer.js';
 
 function mulaiEdit(agenda) {
   AdminRenderer.isiFormUntukEdit(agenda);
@@ -81,7 +81,9 @@ async function muatData() {
 function terapkanPencarianArsip() {
   const kataKunci = (document.getElementById('cari-arsip').value || '').trim().toLowerCase();
   const hasil = !kataKunci ? arsipLengkap : arsipLengkap.filter(a => {
-    const gabungan = [a.judul_kegiatan, a.tanggal, a.penyelenggara, a.peserta].join(' ').toLowerCase();
+    // Sertakan tanggal versi mentah (2026-08-19) DAN versi tampilan (19-08-2026) —
+    // pengguna wajar mengetik sesuai yang terlihat di tabel, bukan format aslinya.
+    const gabungan = [a.judul_kegiatan, a.tanggal, formatTanggalID(a.tanggal), a.penyelenggara, a.peserta].join(' ').toLowerCase();
     return gabungan.includes(kataKunci);
   });
   AdminRenderer.renderArsip(hasil, mulaiEdit); // pakai form yang sama — isi notulen lewat alur edit biasa
