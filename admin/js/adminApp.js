@@ -14,13 +14,11 @@ function mulaiEdit(agenda) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/** Membuka modal kustom untuk minta alasan pembatalan — bukan prompt() bawaan browser,
- *  karena prompt() sering diblokir/tidak muncul di banyak browser mobile. */
+/** Membuka modal kustom konfirmasi hapus — bukan prompt()/confirm() bawaan browser,
+ *  karena keduanya sering diblokir/tidak muncul di banyak browser mobile. */
 function batalkanAgenda(agenda) {
   const modal = document.getElementById('modal-batalkan');
-  const inputAlasan = document.getElementById('modal-batalkan-alasan');
   document.getElementById('modal-batalkan-judul').textContent = `"${agenda.judul_kegiatan}"`;
-  inputAlasan.value = '';
   modal.classList.remove('hidden');
 
   const tombolKonfirmasi = document.getElementById('modal-batalkan-konfirmasi');
@@ -33,10 +31,9 @@ function batalkanAgenda(agenda) {
   }
 
   async function konfirmasi() {
-    const alasan = inputAlasan.value.trim();
     tutup();
-    AdminRenderer.tampilkanPesan('sukses', 'Permintaan pembatalan dikirim, memuat ulang daftar…');
-    await AdminApiService.batalkanAgenda(agenda.id_agenda, alasan);
+    AdminRenderer.tampilkanPesan('sukses', 'Menghapus agenda, memuat ulang daftar…');
+    await AdminApiService.batalkanAgenda(agenda.id_agenda);
     await muatData();
     // Refresh kedua sebagai pengaman — kalau refresh pertama masih terlalu cepat
     // (penulisan di Apps Script belum benar-benar selesai), yang kedua ini menangkapnya.

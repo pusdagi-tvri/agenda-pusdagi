@@ -62,15 +62,11 @@ export const AdminRenderer = {
       tombolEdit.className = 'text-[#60A5FA] text-sm font-medium mr-3 hover-brighten';
       tombolEdit.addEventListener('click', () => onEdit(a));
 
-      if (a.status !== 'Batal') {
-        const tombolBatal = document.createElement('button');
-        tombolBatal.textContent = 'Batalkan';
-        tombolBatal.className = 'text-[#EF4444] text-sm font-medium hover-brighten';
-        tombolBatal.addEventListener('click', () => onBatalkan(a));
-        tdAksi.append(tombolEdit, tombolBatal);
-      } else {
-        tdAksi.append(tombolEdit);
-      }
+      const tombolHapus = document.createElement('button');
+      tombolHapus.textContent = 'Hapus';
+      tombolHapus.className = 'text-[#EF4444] text-sm font-medium hover-brighten';
+      tombolHapus.addEventListener('click', () => onBatalkan(a));
+      tdAksi.append(tombolEdit, tombolHapus);
 
       tbody.appendChild(tr);
     });

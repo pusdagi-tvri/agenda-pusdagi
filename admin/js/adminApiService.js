@@ -106,7 +106,7 @@ export const AdminApiService = {
     return kirimForm({ action: 'updateAgenda', id_agenda: idAgenda, payload });
   },
 
-  batalkanAgenda(idAgenda, alasan) {
-    return kirimForm({ action: 'cancelAgenda', id_agenda: idAgenda, alasan });
+  batalkanAgenda(idAgenda) {
+    return kirimForm({ action: 'cancelAgenda', id_agenda: idAgenda });
   }
 };
