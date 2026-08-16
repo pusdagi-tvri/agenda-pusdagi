@@ -75,7 +75,59 @@
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .form-divider { height: 1px; background: #E5E7EB; }
+
+  /* ============================================================
+     MODE GELAP (opsional, toggle) — default tetap terang di atas.
+     ============================================================ */
+  html[data-theme="dark"] body { background: #0F172A; color: #F8FAFC; }
+  html[data-theme="dark"] input,
+  html[data-theme="dark"] select,
+  html[data-theme="dark"] textarea {
+    background: #1E293B !important; border-color: rgba(255,255,255,0.1) !important; color: #F8FAFC !important;
+  }
+  html[data-theme="dark"] input::placeholder,
+  html[data-theme="dark"] textarea::placeholder { color: #64748B !important; }
+  html[data-theme="dark"] label { color: #94A3B8 !important; }
+  html[data-theme="dark"] .card-premium,
+  html[data-theme="dark"] .card-premium-glass {
+    background: #1E293B !important; border-color: rgba(255,255,255,0.08) !important;
+  }
+  html[data-theme="dark"] .text-heading { color: #F8FAFC !important; }
+  html[data-theme="dark"] .text-subheading { color: #CBD5E1 !important; }
+  html[data-theme="dark"] .text-caption { color: #94A3B8 !important; }
+  html[data-theme="dark"] .form-section-label { color: #CBD5E1 !important; }
+  html[data-theme="dark"] .form-divider { background: rgba(255,255,255,0.08) !important; }
+  html[data-theme="dark"] .badge-success { background: rgba(34,197,94,0.14) !important; color: #4ADE80 !important; border-color: rgba(34,197,94,0.28) !important; }
+  html[data-theme="dark"] .badge-info    { background: rgba(37,99,235,0.14) !important; color: #60A5FA !important; border-color: rgba(37,99,235,0.28) !important; }
+  html[data-theme="dark"] .badge-warning { background: rgba(245,158,11,0.14) !important; color: #FBBF24 !important; border-color: rgba(245,158,11,0.28) !important; }
+  html[data-theme="dark"] .badge-danger  { background: rgba(239,68,68,0.14) !important; color: #FCA5A5 !important; border-color: rgba(239,68,68,0.28) !important; }
+  html[data-theme="dark"] [class*="text-[#6B7280]"] { color: #94A3B8 !important; }
+  html[data-theme="dark"] [class*="border-[#E5E7EB]"] { border-color: rgba(255,255,255,0.1) !important; }
+  html[data-theme="dark"] [class*="border-[#F1F1F1]"] { border-color: rgba(255,255,255,0.08) !important; }
+  html[data-theme="dark"] [class*="text-[#DC2626]"] { color: #FCA5A5 !important; }
+  html[data-theme="dark"] [class*="text-[#2563EB]"] { color: #60A5FA !important; }
+  html[data-theme="dark"] #modal-batalkan-judul { color: #94A3B8 !important; }
+
+  /* Tombol toggle tema */
+  #tombol-tema-admin {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: #FFFFFF; border: 1px solid #E5E7EB; cursor: pointer;
+  }
+  html[data-theme="dark"] #tombol-tema-admin { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+  #ikon-bulan-admin { display: block; }
+  #ikon-matahari-admin { display: none; }
+  html[data-theme="dark"] #ikon-bulan-admin { display: none; }
+  html[data-theme="dark"] #ikon-matahari-admin { display: block; }
 </style>
+
+<script>
+  // Diterapkan sebelum body dirender, supaya tidak ada "kedipan" tema saat halaman dimuat.
+  (function () {
+    const tersimpan = localStorage.getItem('tema-admin');
+    if (tersimpan === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  })();
+</script>
 </head>
 <body class="min-h-screen">
 
@@ -110,7 +162,13 @@
           <p class="text-caption normal-case tracking-normal mt-1">Pusat Data dan Strategi Lembaga Penyiaran Pulbik TVRI</p>
         </div>
       </div>
-      <button id="tombol-logout" class="text-sm text-[#6B7280] hover-brighten">Keluar</button>
+      <div class="flex items-center gap-3">
+        <button id="tombol-tema-admin" title="Ganti mode gelap/terang" aria-label="Ganti mode gelap/terang">
+          <svg id="ikon-bulan-admin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+          <svg id="ikon-matahari-admin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        </button>
+        <button id="tombol-logout" class="text-sm text-[#6B7280] hover-brighten">Keluar</button>
+      </div>
     </div>
 
     <p id="pesan-panel" class="hidden rounded-xl px-4 py-3 text-sm mb-6"></p>
