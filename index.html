@@ -417,6 +417,46 @@
 
 </div>
 
+      </div>
+    </main>
+
+    <!-- AGENDA MENDATANG - selebar penuh (800-1020px) -->
+    <section class="px-8" style="height:250px;">
+      <div class="card-flat card-shadow rounded-[20px] p-6 h-full flex flex-col">
+        <div class="flex items-center justify-between mb-4 shrink-0">
+          <h2 class="text-base font-semibold text-[#94A3B8] tracking-wide uppercase">Agenda Mendatang (7 Hari ke Depan)</h2>
+        </div>
+        <div class="flex-1 relative">
+          <div id="agenda-mendatang-skeleton" class="flex gap-4 h-full">
+            <div class="skeleton flex-1 rounded-2xl"></div>
+            <div class="skeleton flex-1 rounded-2xl"></div>
+            <div class="skeleton flex-1 rounded-2xl"></div>
+            <div class="skeleton flex-1 rounded-2xl"></div>
+          </div>
+          <div id="agenda-mendatang-content" class="hidden fade-in h-full"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RUNNING TEXT FOOTER (1020-1080px) -->
+    <footer class="card-flat card-shadow flex items-center px-3 mt-3" style="height:44px;">
+      <div class="flex items-center justify-center shrink-0" style="width:28px; height:28px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M3 11v2a1 1 0 0 0 1 1h2l3.5 3.5A1 1 0 0 0 11 17V7a1 1 0 0 0-1.5-.87L6 10H4a1 1 0 0 0-1 1Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+      </div>
+      <div class="overflow-hidden flex-1">
+        <div class="marquee-track">
+          <span id="marquee-a" class="flex items-center text-[#F8FAFC] text-[14px] font-medium whitespace-nowrap" style="margin-right:0px;"></span>
+          <span id="marquee-b" class="flex items-center text-[#F8FAFC] text-[14px] font-medium whitespace-nowrap" aria-hidden="true" style="margin-right:0px;"></span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0 pl-3 text-[12px] text-[#94A3B8]">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#2563EB]"></span>
+        Informasi akan diperbarui otomatis
+      </div>
+    </footer>
+
+  </div>
+
 <script type="module" src="js/app.js"></script>
 
 </body>
