@@ -13,26 +13,12 @@
 <style>
   /* ============================================================
      DESAIN FLAT / MINIMALIS — bulletin board korporat modern.
-     Tanpa gradient berat, tanpa glassmorphism/blur, tanpa shadow
-     tebal — border tipis 1px dan warna solid sebagai gantinya.
+     DEFAULT MODE: DARK
      ============================================================ */
   
-  /* CSS VARIABLES untuk Light & Dark Mode */
+  /* CSS VARIABLES untuk Dark & Light Mode */
+  /* DEFAULT: DARK MODE */
   :root {
-    --bg-body: #F8F9FA;
-    --bg-card: #FFFFFF;
-    --bg-input: #FFFFFF;
-    --border-color: #E5E7EB;
-    --text-primary: #1F2937;
-    --text-secondary: #6B7280;
-    --text-muted: #9CA3AF;
-    --text-heading: #111827;
-    --text-subheading: #374151;
-    --border-table: #E5E7EB;
-    --bg-table-header: #F9FAFB;
-  }
-
-  html[data-theme="dark"] {
     --bg-body: #0F172A;
     --bg-card: #1E293B;
     --bg-input: #1E293B;
@@ -44,6 +30,23 @@
     --text-subheading: #CBD5E1;
     --border-table: rgba(255,255,255,0.08);
     --bg-table-header: #1E293B;
+    --shadow-color: rgba(0,0,0,0.35);
+  }
+
+  /* LIGHT MODE - diaktifkan via data-theme="light" */
+  html[data-theme="light"] {
+    --bg-body: #F8F9FA;
+    --bg-card: #FFFFFF;
+    --bg-input: #FFFFFF;
+    --border-color: #E5E7EB;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --text-heading: #111827;
+    --text-subheading: #374151;
+    --border-table: #E5E7EB;
+    --bg-table-header: #F9FAFB;
+    --shadow-color: rgba(0,0,0,0.08);
   }
 
   * { font-family: 'Inter', sans-serif; }
@@ -75,14 +78,14 @@
   input::placeholder, textarea::placeholder { color: var(--text-muted); }
   label { font-size: 13px; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 6px; }
 
-  /* Kartu flat — border tipis, tanpa shadow tebal */
+  /* Kartu flat */
   .card-premium, .card-premium-glass {
     background: var(--bg-card) !important;
     border: 1px solid var(--border-color) !important;
-    box-shadow: none !important;
+    box-shadow: 0 4px 16px var(--shadow-color) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    transition: background 0.3s ease, border-color 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
 
   .text-heading { font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: var(--text-heading); }
@@ -101,16 +104,17 @@
   .hover-brighten { transition: opacity 0.15s ease; cursor: pointer; }
   .hover-brighten:hover { opacity: 0.7; }
 
-  /* Badge status */
-  .badge-success { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
-  .badge-info    { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
-  .badge-warning { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
-  .badge-danger  { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+  /* Badge status - Dark Mode default */
+  .badge-success { background: rgba(34,197,94,0.14); color: #4ADE80; border: 1px solid rgba(34,197,94,0.28); }
+  .badge-info    { background: rgba(37,99,235,0.14); color: #60A5FA; border: 1px solid rgba(37,99,235,0.28); }
+  .badge-warning { background: rgba(245,158,11,0.14); color: #FBBF24; border: 1px solid rgba(245,158,11,0.28); }
+  .badge-danger  { background: rgba(239,68,68,0.14); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.28); }
 
-  html[data-theme="dark"] .badge-success { background: rgba(34,197,94,0.14); color: #4ADE80; border-color: rgba(34,197,94,0.28); }
-  html[data-theme="dark"] .badge-info    { background: rgba(37,99,235,0.14); color: #60A5FA; border-color: rgba(37,99,235,0.28); }
-  html[data-theme="dark"] .badge-warning { background: rgba(245,158,11,0.14); color: #FBBF24; border-color: rgba(245,158,11,0.28); }
-  html[data-theme="dark"] .badge-danger  { background: rgba(239,68,68,0.14); color: #FCA5A5; border-color: rgba(239,68,68,0.28); }
+  /* Light Mode badge */
+  html[data-theme="light"] .badge-success { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+  html[data-theme="light"] .badge-info    { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+  html[data-theme="light"] .badge-warning { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+  html[data-theme="light"] .badge-danger  { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
 
   /* Form section */
   .form-section-label {
@@ -135,19 +139,37 @@
     transition: background 0.3s ease, border-color 0.3s ease;
   }
   #tombol-tema-admin:hover { background: var(--border-color); }
+  
+  /* Default Dark: tampilkan bulan, sembunyikan matahari */
   #ikon-bulan-admin { display: block; stroke: var(--text-secondary); }
   #ikon-matahari-admin { display: none; stroke: #FBBF24; }
-  html[data-theme="dark"] #ikon-bulan-admin { display: none; }
-  html[data-theme="dark"] #ikon-matahari-admin { display: block; }
+  
+  /* Light Mode: tampilkan matahari, sembunyikan bulan */
+  html[data-theme="light"] #ikon-bulan-admin { display: none; }
+  html[data-theme="light"] #ikon-matahari-admin { display: block; }
 
   /* Table styling */
   table { border-collapse: collapse; }
   thead tr { border-bottom: 1px solid var(--border-table); }
-  thead th { color: var(--text-secondary); font-weight: 600; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  thead th { 
+    color: var(--text-secondary); 
+    font-weight: 600; 
+    font-size: 0.75rem; 
+    letter-spacing: 0.06em; 
+    text-transform: uppercase; 
+    padding: 10px 12px;
+  }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border-table); }
   #wrapper-tabel-arsip thead tr { background: var(--bg-table-header); position: sticky; top: 0; z-index: 10; }
 
   /* Modal */
   #modal-batalkan { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+
+  /* Scrollbar styling - Dark mode */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 4px; }
+  html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); }
 
   /* Responsive */
   @media (max-width: 768px) {
@@ -155,14 +177,23 @@
     .max-w-5xl { max-width: 100%; }
     #layar-panel { padding: 10px; }
     .card-premium, .card-premium-glass { padding: 16px !important; }
+    .grid-cols-2 { grid-template-columns: 1fr; }
   }
 </style>
 
 <script>
   // Diterapkan sebelum body dirender, supaya tidak ada "kedipan" tema saat halaman dimuat.
   (function () {
+    // DEFAULT: DARK MODE
+    // Cek localStorage, jika ada 'light' maka pakai light, selain itu dark (default)
     const tersimpan = localStorage.getItem('tema-admin');
-    if (tersimpan === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    if (tersimpan === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      // Default dark - tidak perlu set atribut, karena :root sudah dark
+      // Tapi kita set untuk konsistensi
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
   })();
 </script>
 </head>
@@ -172,7 +203,7 @@
   <div id="layar-login" class="min-h-screen flex items-center justify-center px-4">
     <form id="form-login" class="card-premium-glass rounded-2xl p-8 w-full max-w-sm">
       <div class="w-12 h-12 rounded-2xl bg-[#2563EB] flex items-center justify-center p-2 mb-4">
-        <!-- Logo TVRI - Base64 inline -->
+        <!-- Logo TVRI - SVG inline -->
         <svg viewBox="0 0 100 100" class="w-full h-full" fill="white">
           <rect x="10" y="20" width="80" height="60" rx="4" stroke="white" stroke-width="2" fill="none"/>
           <text x="50" y="58" font-size="28" font-weight="bold" text-anchor="middle" fill="white" font-family="Arial">TVRI</text>
@@ -438,27 +469,31 @@
   <!-- Target form submission -->
   <iframe name="admin-write-target" style="display:none"></iframe>
 
-  <!-- Tambahkan script langsung di sini untuk memastikan tombol tema berfungsi -->
+  <!-- Script toggle tema - langsung di halaman agar selalu berfungsi -->
   <script>
-    // Fungsi toggle tema yang langsung terpasang di halaman
-    document.addEventListener('DOMContentLoaded', function() {
-      const tombolTema = document.getElementById('tombol-tema-admin');
-      
-      if (tombolTema) {
-        tombolTema.addEventListener('click', function() {
-          const html = document.documentElement;
-          const isDark = html.getAttribute('data-theme') === 'dark';
-          
-          if (isDark) {
-            html.removeAttribute('data-theme');
-            localStorage.setItem('tema-admin', 'light');
-          } else {
-            html.setAttribute('data-theme', 'dark');
-            localStorage.setItem('tema-admin', 'dark');
-          }
-        });
+    (function() {
+      // Fungsi toggle tema
+      function toggleTema() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        
+        if (isDark) {
+          html.setAttribute('data-theme', 'light');
+          localStorage.setItem('tema-admin', 'light');
+        } else {
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('tema-admin', 'dark');
+        }
       }
-    });
+
+      // Pasang event listener setelah DOM siap
+      document.addEventListener('DOMContentLoaded', function() {
+        const tombol = document.getElementById('tombol-tema-admin');
+        if (tombol) {
+          tombol.addEventListener('click', toggleTema);
+        }
+      });
+    })();
   </script>
 
 <script type="module" src="js/adminApp.js"></script>
