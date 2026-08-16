@@ -1,74 +1,132 @@
 /* =============================================================
    styles.css — Tema "Executive Agenda Dashboard" TVRI Pusdagi
-   VERSI BULLETPROOF (Pasti Berubah)
+   VERSI REFINED (lebih modern & bersih)
+
+   Cara pakai: TIMPA isi styles.css lama Anda dengan file ini.
+   - Struktur HTML tidak diubah sama sekali.
+   - Semua id data (exec-total, jam-digital, dst) & logo base64 tetap.
+   - Bar "Progress Hari" dihapus rapi lewat CSS (tanpa mengedit HTML),
+     grid statistik otomatis menyesuaikan dari 8 -> 7 kolom.
    ============================================================= */
 
 /* -------------------------------------------------------------
-   1. MEMAKSA GANTI BACKGROUND UTAMA (Mengalahkan Tailwind CDN)
+   1. PALET WARNA (Mode Gelap = default)
+   Variabel ini dipakai oleh .card-flat, .glass, dll di HTML.
+   Nuansa navy dibuat lebih pekat & bersih, border lebih halus.
    ------------------------------------------------------------- */
-html, body, [class*="bg-[#0F172A]"] { 
-  background-color: #080C14 !important; /* Navy Pekat */
-  color: #E2E8F0 !important;
+:root {
+  --color-bg:       #0B1220; /* latar utama — navy pekat, bersih   */
+  --color-card:     #131D31; /* permukaan kartu utama              */
+  --color-card-alt: #1A2740; /* permukaan sekunder                 */
+  --border-glass:   rgba(148, 163, 184, 0.10); /* border slate halus */
+
+  --color-accent:   #2563EB; /* biru TVRI (aksen)                  */
+  --color-warning:  #F59E0B;
+  --color-success:  #22C55E;
+  --color-danger:   #EF4444;
 }
 
 /* -------------------------------------------------------------
-   2. MEMAKSA DESAIN KARTU & GLASSMORPHISM (Mengalahkan <style> HTML)
+   2. KELAS DASAR yang dibutuhkan HTML
+   (.glass & .animate-slide-up dipakai di markup tapi tidak
+    didefinisikan pada <style> inline — jadi wajib ada di sini.)
    ------------------------------------------------------------- */
-.card-flat, [class*="bg-[#334155]"] {
-  background-color: #111827 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
 .glass {
-  background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  backdrop-filter: blur(16px) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.045),
+    rgba(255, 255, 255, 0.012)
+  );
+  border: 1px solid var(--border-glass);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
-/* Bayangan Kartu yang Elegan dan Menyebar */
-.card-shadow {
-  box-shadow:
-    0 1px 1px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.4),
-    0 10px 25px -5px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
-/* Efek Saat Kursor Diarahkan ke Kartu (Hover) */
-.card-hover:hover {
-  transform: translateY(-5px) scale(1.01) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.2),
-    0 8px 12px -3px rgba(0, 0, 0, 0.5),
-    0 20px 35px -10px rgba(0, 0, 0, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-}
+.animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* -------------------------------------------------------------
-   3. MEMPERBAIKI TATA LETAK GRID (Menghilangkan Ruang Kosong)
+   3. RETHEME PERMUKAAN yang di-hardcode di HTML
+   Class arbitrary Tailwind (bg-[#0F172A], bg-[#334155]) dipetakan
+   ke palet baru. Selektor [class*="..."] dipakai agar tidak perlu
+   meng-escape karakter # [ ] (pola yang sama seperti mode terang).
    ------------------------------------------------------------- */
-/* Menyembunyikan "Progress Hari" sepenuhnya */
-.grid-cols-8 > div:has(#exec-progress-hari-label) { 
-  display: none !important; 
-}
+html, body { background: var(--color-bg); }
 
-/* Memaksa layout yang tadinya 8 kolom menjadi 7 kolom agar penuh */
-.grid-cols-8, [class*="grid-cols-8"] {
-  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
-}
+[class*="bg-[#0F172A]"] { background-color: var(--color-bg) !important; }
+[class*="bg-[#334155]"] { background-color: #1E293B !important; }
 
 /* -------------------------------------------------------------
-   4. PERCANTIK ELEMEN KECIL
+   4. SENTUHAN MODERN pada kartu
+   Load order styles.css < <style> inline, jadi untuk menimpa
+   .card-flat/.card-shadow inline dipakai prefiks #stage agar
+   spesifisitas lebih tinggi (id > class), tanpa mengubah HTML.
    ------------------------------------------------------------- */
-/* Ikon Statistik (Mendapat efek cahaya transparan) */
-.stat-icon {
-  background: rgba(255,255,255,0.04) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+#stage .card-flat {
+  background: var(--color-card);
+  border: 1px solid var(--border-glass);
 }
 
-/* Garis Tipis di Bawah Header */
-header.glass {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+/* Bayangan berlapis + garis highlight tipis di tepi atas (efek "kaca") */
+#stage .card-shadow {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 18px 40px -20px rgba(2, 6, 23, 0.85);
 }
+
+#stage .card-hover {
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+#stage .card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(148, 163, 184, 0.22);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 26px 54px -22px rgba(2, 6, 23, 0.9);
+}
+
+/* Ikon statistik: sedikit lebih besar radius + ring halus */
+#stage .stat-icon {
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Header lebih bersih: pemisah tipis di bawah, bukan bayangan berat */
+#stage header.glass {
+  border-bottom: 1px solid var(--border-glass);
+}
+
+/* Timeline garis lebih halus & modern */
+#stage .timeline-row::before { background: rgba(148, 163, 184, 0.14); }
+#stage .timeline-dot { box-shadow: 0 0 0 3px rgba(11, 18, 32, 0.9); }
+
+/* Progress "Persentase Jam Kerja" — track & isian lebih halus */
+#stage [class*="bg-[#334155]"] { background-color: rgba(148, 163, 184, 0.16) !important; }
+
+/* -------------------------------------------------------------
+   5. HAPUS BAR "PROGRESS HARI" (permintaan Anda)
+   Kartunya disembunyikan lewat :has() sehingga elemen tetap ada
+   di DOM (app.js tidak error), lalu grid dirapikan jadi 7 kolom.
+   ------------------------------------------------------------- */
+#stage .grid-cols-8 > div:has(#exec-progress-hari-label) { display: none !important; }
+#stage .grid-cols-8 { grid-template-columns: repeat(7, minmax(0, 1fr)) !important; }
+
+/* -------------------------------------------------------------
+   6. MODE TERANG
+   Variabel di :root sudah otomatis ditimpa oleh blok
+   html[data-theme="light"] pada <style> inline index.html.
+   Di sini hanya penyesuaian ringan agar kartu tetap bersih.
+   ------------------------------------------------------------- */
+html[data-theme="light"] #stage .card-shadow {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
+    0 12px 28px -18px rgba(15, 23, 42, 0.25);
+}
+html[data-theme="light"] #stage .card-flat { border-color: rgba(15, 23, 42, 0.08); }
+html[data-theme="light"] #stage .stat-icon { box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.05); }
