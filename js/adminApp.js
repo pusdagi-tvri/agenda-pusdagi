@@ -7,20 +7,18 @@
 
 import { AdminAuth } from './adminAuth.js';
 import { AdminApiService } from './adminApiService.js';
-import { AdminRenderer } from './adminRenderer.js';
+import { AdminRenderer, formatTanggalID } from './adminRenderer.js';
 
 function mulaiEdit(agenda) {
   AdminRenderer.isiFormUntukEdit(agenda);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/** Membuka modal kustom untuk minta alasan pembatalan — bukan prompt() bawaan browser,
- *  karena prompt() sering diblokir/tidak muncul di banyak browser mobile. */
+/** Membuka modal kustom konfirmasi hapus — bukan prompt()/confirm() bawaan browser,
+ *  karena keduanya sering diblokir/tidak muncul di banyak browser mobile. */
 function batalkanAgenda(agenda) {
   const modal = document.getElementById('modal-batalkan');
-  const inputAlasan = document.getElementById('modal-batalkan-alasan');
   document.getElementById('modal-batalkan-judul').textContent = `"${agenda.judul_kegiatan}"`;
-  inputAlasan.value = '';
   modal.classList.remove('hidden');
 
   const tombolKonfirmasi = document.getElementById('modal-batalkan-konfirmasi');
@@ -33,10 +31,9 @@ function batalkanAgenda(agenda) {
   }
 
   async function konfirmasi() {
-    const alasan = inputAlasan.value.trim();
     tutup();
-    AdminRenderer.tampilkanPesan('sukses', 'Permintaan pembatalan dikirim, memuat ulang daftar…');
-    await AdminApiService.batalkanAgenda(agenda.id_agenda, alasan);
+    AdminRenderer.tampilkanPesan('sukses', 'Menghapus agenda, memuat ulang daftar…');
+    await AdminApiService.batalkanAgenda(agenda.id_agenda);
     await muatData();
     // Refresh kedua sebagai pengaman — kalau refresh pertama masih terlalu cepat
     // (penulisan di Apps Script belum benar-benar selesai), yang kedua ini menangkapnya.
@@ -67,13 +64,29 @@ async function tanganiSubmitForm(e) {
   // memastikan agenda benar-benar tersimpan sesuai yang diharapkan.
 }
 
+let arsipLengkap = []; // disimpan supaya pencarian bisa filter tanpa fetch ulang ke server
+
 /** Satu panggilan (/dashboard) untuk mengisi dropdown pimpinan/ruangan, daftar agenda, dan arsip rapat. */
 async function muatData() {
   const { pimpinan, ruangan, agenda, arsip } = await AdminApiService.ambilRingkasan();
   AdminRenderer.isiDatalist('datalist-pimpinan', pimpinan, 'nama_lengkap');
   AdminRenderer.isiDatalist('datalist-ruangan', ruangan, 'nama_ruangan');
   AdminRenderer.renderDaftarAgenda(agenda, mulaiEdit, batalkanAgenda);
-  AdminRenderer.renderArsip(arsip, mulaiEdit); // pakai form yang sama — isi notulen lewat alur edit biasa
+
+  arsipLengkap = arsip;
+  terapkanPencarianArsip(); // supaya kata kunci yang sudah diketik tetap berlaku setelah refresh data
+}
+
+/** Filter arsip berdasarkan kata kunci di kolom judul, tanggal, penyelenggara, atau peserta. */
+function terapkanPencarianArsip() {
+  const kataKunci = (document.getElementById('cari-arsip').value || '').trim().toLowerCase();
+  const hasil = !kataKunci ? arsipLengkap : arsipLengkap.filter(a => {
+    // Sertakan tanggal versi mentah (2026-08-19) DAN versi tampilan (19-08-2026) —
+    // pengguna wajar mengetik sesuai yang terlihat di tabel, bukan format aslinya.
+    const gabungan = [a.judul_kegiatan, a.tanggal, formatTanggalID(a.tanggal), a.penyelenggara, a.peserta].join(' ').toLowerCase();
+    return gabungan.includes(kataKunci);
+  });
+  AdminRenderer.renderArsip(hasil, mulaiEdit); // pakai form yang sama — isi notulen lewat alur edit biasa
 }
 
 async function bukaPanel() {
@@ -107,11 +120,30 @@ function tanganiLogout() {
   AdminRenderer.tampilkanLogin();
 }
 
+/** Toggle mode gelap/terang — disimpan di localStorage supaya pilihan bertahan lintas refresh. */
+function inisialisasiToggleTemaAdmin() {
+  const tombol = document.getElementById('tombol-tema-admin');
+  if (!tombol) return;
+
+  tombol.addEventListener('click', () => {
+    const sudahGelap = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (sudahGelap) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('tema-admin', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('tema-admin', 'dark');
+    }
+  });
+}
+
 function init() {
+  inisialisasiToggleTemaAdmin();
   document.getElementById('form-login').addEventListener('submit', tanganiSubmitLogin);
   document.getElementById('form-agenda').addEventListener('submit', tanganiSubmitForm);
   document.getElementById('tombol-reset-form').addEventListener('click', () => AdminRenderer.resetForm());
   document.getElementById('tombol-logout').addEventListener('click', tanganiLogout);
+  document.getElementById('cari-arsip').addEventListener('input', terapkanPencarianArsip);
 
   if (AdminAuth.sudahLogin()) {
     bukaPanel();
