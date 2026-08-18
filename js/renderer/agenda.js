@@ -240,7 +240,10 @@ export const AgendaRenderer = {
 
     content.innerHTML = `
       <div class="flex items-center justify-between mb-2">
-        <p class="text-[12px] text-[#94A3B8] uppercase tracking-wide">Agenda Berikutnya</p>
+        <p class="text-[12px] text-[#94A3B8] uppercase tracking-wide flex items-center gap-1.5">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5" class="shrink-0"><path d="M13 5l7 7-7 7M5 12h14"/></svg>
+          Agenda Berikutnya
+        </p>
         <p class="font-semibold text-sm shrink-0 ml-3" style="color:#F59E0B" data-countdown>${label}</p>
       </div>
       <div class="flex items-center gap-1.5">
