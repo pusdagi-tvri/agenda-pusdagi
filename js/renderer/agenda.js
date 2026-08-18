@@ -239,15 +239,15 @@ export const AgendaRenderer = {
     const warna = STATUS_COLOR_CLASS[STATUS_OTOMATIS.BELUM_DIMULAI];
 
     content.innerHTML = `
-      <p class="text-[12px] text-[#94A3B8] uppercase tracking-wide mb-2">Agenda Berikutnya</p>
-      <div class="flex items-center justify-between">
-        <div class="min-w-0">
-          <span class="status-dot ${warna.dot}" style="display:inline-block;"></span>
-          <span class="text-[13px] text-caption normal-case tracking-normal ml-1">${agenda.jam_mulai}</span>
-          <h3 class="text-[16px] font-semibold text-[#F8FAFC] truncate mt-0.5">${escapeHTML(agenda.judul_kegiatan)}</h3>
-        </div>
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-[12px] text-[#94A3B8] uppercase tracking-wide">Agenda Berikutnya</p>
         <p class="font-semibold text-sm shrink-0 ml-3" style="color:#F59E0B" data-countdown>${label}</p>
       </div>
+      <div class="flex items-center gap-1.5">
+        <span class="status-dot ${warna.dot} shrink-0"></span>
+        <span class="text-[13px] text-caption normal-case tracking-normal">${agenda.jam_mulai}</span>
+      </div>
+      <h3 class="text-[16px] font-semibold text-[#F8FAFC] mt-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.3;">${escapeHTML(agenda.judul_kegiatan)}</h3>
     `;
   },
 
