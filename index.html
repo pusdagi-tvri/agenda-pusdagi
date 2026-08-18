@@ -333,89 +333,37 @@
         </section>
 
         <div class="flex flex-col gap-4 min-h-0">
-          
-  <!-- 1. KARTU SEDANG BERLANGSUNG -->
-  <section id="card-berlangsung" 
-           class="glass card-shadow card-hover rounded-[20px] p-6 relative overflow-hidden" 
-           style="height:195px;">
-    <!-- Watermark Ikon Jam/Radar -->
-    <div class="absolute -right-6 top-2 text-amber-500 opacity-[0.12] pointer-events-none transition-transform duration-700 hover:scale-110 transform-gpu">
-      <svg width="130" height="130" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polyline points="12 6 12 12 16 14"></polyline>
-      </svg>
-    </div>
-    
-    <!-- Live indicator -->
-    <div class="flex items-center gap-2 mb-2 relative z-10">
-      <span class="w-2 h-2 rounded-full bg-[#22C55E] dot-live"></span>
-      <span class="text-[11px] font-semibold text-[#22C55E] uppercase tracking-wider">Sedang Berlangsung</span>
-    </div>
-    
-    <div id="berlangsung-skeleton" class="space-y-3 relative z-10">
-      <div class="skeleton h-4 w-24 rounded-full"></div>
-      <div class="skeleton h-6 w-3/4 rounded-lg"></div>
-      <div class="skeleton h-1.5 w-full rounded-full mt-4"></div>
-    </div>
-    <div id="berlangsung-content" class="hidden fade-in h-full flex flex-col justify-center relative z-10"></div>
-  </section>
 
-  <!-- 2. KARTU AGENDA BERIKUTNYA -->
-  <section id="card-berikutnya" 
-           class="card-flat card-shadow card-hover rounded-[20px] p-6 relative overflow-hidden" 
-           style="height:135px;">
-    <!-- Watermark Ikon Kalender -->
-    <div class="absolute -right-4 -bottom-4 text-blue-500 opacity-[0.08] pointer-events-none transition-transform duration-700 hover:scale-110 transform-gpu">
-      <svg width="110" height="110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
-      </svg>
-    </div>
+          <section id="card-berlangsung"
+                   class="glass card-shadow card-hover rounded-[20px] p-6 relative overflow-hidden"
+                   style="height:195px;">
+            <div id="berlangsung-skeleton" class="space-y-3">
+              <div class="skeleton h-4 w-24 rounded-full"></div>
+              <div class="skeleton h-6 w-3/4 rounded-lg"></div>
+              <div class="skeleton h-1.5 w-full rounded-full mt-4"></div>
+            </div>
+            <div id="berlangsung-content" class="hidden fade-in h-full flex flex-col justify-center"></div>
+          </section>
 
-    <!-- Header dengan ikon -->
-    <div class="flex items-center gap-2 mb-2 relative z-10">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-        <polyline points="17 6 23 6 23 12"></polyline>
-      </svg>
-      <span class="text-[11px] font-semibold text-[#94A3B8] uppercase tracking-wider">Agenda Berikutnya</span>
-    </div>
+          <section id="card-berikutnya"
+                   class="card-flat card-shadow card-hover rounded-[20px] p-6 overflow-hidden"
+                   style="height:135px;">
+            <div id="berikutnya-skeleton" class="space-y-3">
+              <div class="skeleton h-4 w-20 rounded-full"></div>
+              <div class="skeleton h-5 w-2/3 rounded-lg"></div>
+            </div>
+            <div id="berikutnya-content" class="hidden animate-slide-up"></div>
+          </section>
 
-    <div id="berikutnya-skeleton" class="space-y-3 relative z-10">
-      <div class="skeleton h-4 w-20 rounded-full"></div>
-      <div class="skeleton h-5 w-2/3 rounded-lg"></div>
-    </div>
-    <div id="berikutnya-content" class="hidden fade-in relative z-10 h-[calc(100%-28px)] flex items-center"></div>
-  </section>
+          <section class="card-flat card-shadow card-hover rounded-[20px] p-6 flex-1 flex flex-col overflow-hidden min-h-0">
+            <h2 class="text-base font-semibold text-[#94A3B8] tracking-wide uppercase mb-2">Statistik Kategori</h2>
+            <div id="statistik-content" class="flex-1 space-y-1 overflow-hidden">
+              <div class="skeleton h-8 w-full rounded-lg"></div>
+              <div class="skeleton h-8 w-full rounded-lg"></div>
+            </div>
+          </section>
 
-  <!-- 3. KARTU STATISTIK KATEGORI -->
-  <section class="card-flat card-shadow card-hover rounded-[20px] p-6 flex-1 flex flex-col overflow-hidden min-h-0 relative">
-    <!-- Watermark Ikon Pie Chart -->
-    <div class="absolute -right-8 -bottom-6 text-slate-500 opacity-[0.08] pointer-events-none transition-transform duration-700 hover:scale-110 transform-gpu">
-      <svg width="140" height="140" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-        <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
-      </svg>
-    </div>
-    
-    <!-- Header dengan ikon -->
-    <h2 class="text-base font-semibold text-[#94A3B8] tracking-wide uppercase mb-3 flex items-center gap-2 relative z-10">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-        <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
-      </svg>
-      Statistik Kategori
-    </h2>
-    
-    <div id="statistik-content" class="flex-1 space-y-1 overflow-hidden relative z-10">
-      <div class="skeleton h-8 w-full rounded-lg"></div>
-      <div class="skeleton h-8 w-full rounded-lg"></div>
-    </div>
-  </section>
-
-</div>
+        </div>
 
       </div>
     </main>
