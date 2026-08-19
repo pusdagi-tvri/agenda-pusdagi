@@ -91,38 +91,27 @@ export function tambahHari(tanggalStr, jumlahHari) {
 }
 
 /**
- * Tanggal-tanggal MENDATANG saja dari satu agenda (1 hari atau multi-hari) —
- * bagian yang hari ini/sudah lewat DIKECUALIKAN (itu sudah tampil di "Agenda
- * Hari Ini"), supaya agenda multi-hari yang sudah mulai tetap menampilkan sisa
- * hari mendatangnya di sini, bukan hilang total begitu hari pertamanya tiba.
- * Dibatasi jendela besok..+7hari dan maksimal 7 hari.
+ * Tanggal-tanggal MENDATANG saja dari satu agenda (1 hari atau multi-hari).
+ * Hari ini dan tanggal yang sudah lewat dikecualikan karena ditampilkan pada
+ * bagian "Agenda Hari Ini". Tidak ada lagi batas 7 hari.
  */
 export function hitungTanggalMendatang(agenda, todayISO) {
   const besokISO = tambahHari(todayISO, 1);
-  const batasAkhirISO = tambahHari(todayISO, 7); // eksklusif
   const selesai = agenda.tanggal_selesai || agenda.tanggal;
   const mulaiEfektif = agenda.tanggal < besokISO ? besokISO : agenda.tanggal;
 
-  if (mulaiEfektif >= batasAkhirISO || selesai < besokISO) return [];
+  if (selesai < besokISO) return [];
 
   const hasil = [];
   let tgl = mulaiEfektif;
-  for (let i = 0; i < 7; i++) {
-    if (tgl > selesai || tgl >= batasAkhirISO) break;
+  while (tgl <= selesai) {
     hasil.push(tgl);
     tgl = tambahHari(tgl, 1);
   }
   return hasil;
 }
 
-/**
- * Agenda besok s/d 7 hari ke depan (TIDAK termasuk hari ini — itu sudah
- * ditampilkan di card lain), dihitung PER HARI (bukan per agenda) lewat
- * hitungTanggalMendatang — satu sumber kebenaran, supaya angka di kartu
- * statistik "Mendatang (7 Hari)" selalu cocok dengan jumlah kartu yang
- * ditampilkan di card "Agenda Mendatang" (termasuk saat agenda multi-hari
- * sudah mulai berjalan, sisa hari mendatangnya tetap terhitung).
- */
+/** Seluruh agenda setelah hari ini, tanpa batas jendela 7 hari. */
 export function hitungAgendaMendatang7Hari(daftarAgendaMendatang, now) {
   const todayISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   return daftarAgendaMendatang
