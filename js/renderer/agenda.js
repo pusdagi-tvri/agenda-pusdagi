@@ -2,7 +2,7 @@
  * ============================================================
  *  renderer/agenda.js
  *  Render konten inti agenda: timeline hari ini, sedang berlangsung,
- *  berikutnya, dan agenda mendatang (7 hari ke depan).
+ *  berikutnya, dan seluruh agenda mendatang.
  * ============================================================
  */
 
@@ -228,16 +228,18 @@ export const AgendaRenderer = {
   },
 
   /**
-   * Menampilkan agenda 7 hari ke depan sebagai kartu horizontal — dipanggil
-   * hanya saat data berubah (siklus 15 detik). Dihitung langsung dari data
-   * mentah (bukan lewat hitungAgendaMendatang7Hari) supaya agenda multi-hari
-   * yang SUDAH MULAI tetap menampilkan sisa hari mendatangnya di sini — bukan
-   * hilang total begitu hari pertamanya tiba (hari pertama itu memang sudah
-   * semestinya pindah ke "Agenda Hari Ini", bukan hilang dari dashboard).
+   * Menampilkan seluruh agenda mendatang. Area utama tetap pada tinggi/layout
+   * yang sama dan memuat kartu sebanyak yang aman terbaca. Jika masih ada
+   * agenda lain, tombol "Lihat selengkapnya" membuka daftar lengkap.
    */
   renderAgendaMendatang(daftarAgendaMendatang, now) {
     const skeleton = $('agenda-mendatang-skeleton');
     const content = $('agenda-mendatang-content');
+    const tombolLihatSemua = $('agenda-mendatang-lihat-semua');
+    const modal = $('agenda-mendatang-modal');
+    const modalContent = $('agenda-mendatang-modal-content');
+    const modalCount = $('agenda-mendatang-modal-count');
+    const tombolTutup = $('agenda-mendatang-modal-tutup');
     if (!content) return;
 
     if (skeleton) skeleton.classList.add('hidden');
@@ -247,28 +249,25 @@ export const AgendaRenderer = {
     const daftar = daftarAgendaMendatang
       .filter((a) => a.status !== 'Batal')
       .flatMap((a) => hitungTanggalMendatang(a, todayISO).map((tgl) => ({ ...a, tanggal: tgl })))
-      .sort((a, b) => a.tanggal.localeCompare(b.tanggal) || a.jam_mulai.localeCompare(b.jam_mulai))
-      .slice(0, 5);
+      .sort((a, b) => a.tanggal.localeCompare(b.tanggal) || a.jam_mulai.localeCompare(b.jam_mulai));
 
     if (!daftar.length) {
       if (content.dataset.signature !== '') {
-        content.innerHTML = `<p class="text-body-elegant flex items-center h-full">Tidak ada agenda terjadwal untuk 7 hari ke depan.</p>`;
+        content.innerHTML = `<p class="text-body-elegant flex items-center h-full">Tidak ada agenda mendatang yang terjadwal.</p>`;
         content.dataset.signature = '';
       }
+      if (tombolLihatSemua) tombolLihatSemua.classList.add('hidden');
+      if (modal) modal.classList.add('hidden');
       return;
     }
-
-    const signature = daftar.map((a) => `${a.id_agenda}:${a.tanggal}`).join(',');
-    if (content.dataset.signature === signature) return;
-    content.dataset.signature = signature;
 
     const WARNA_PRIORITAS = { Tinggi: 'badge-danger', Sedang: 'badge-warning', Rendah: 'badge-info' };
     const DOT_PRIORITAS = { Tinggi: '#EF4444', Sedang: '#F59E0B', Rendah: '#2563EB' };
 
-    const kartu = daftar.map((a) => {
+    const buatKartu = (a, versiModal = false) => {
       const prioritas = a.prioritas || 'Sedang';
       return `
-        <div class="flex-1 min-w-0 rounded-2xl bg-white/[0.03] border border-white/10 p-4 flex flex-col">
+        <div class="${versiModal ? '' : 'flex-1 min-w-0'} rounded-2xl bg-white/[0.03] border border-white/10 p-4 flex flex-col">
           <div class="flex items-center gap-2 mb-2">
             <span class="w-2 h-2 rounded-full shrink-0" style="background:${DOT_PRIORITAS[prioritas] || '#94A3B8'}"></span>
             <span class="text-[13px] font-medium truncate" style="color:${DOT_PRIORITAS[prioritas] || '#94A3B8'}">${labelHariRelatif(a.tanggal, now)}</span>
@@ -283,8 +282,44 @@ export const AgendaRenderer = {
           </div>
         </div>
       `;
-    }).join('');
+    };
 
-    content.innerHTML = `<div class="flex gap-4 h-full animate-fade-in">${kartu}</div>`;
-  }
-};
+    // Dengan lebar stage 1920px, 5 kartu tetap terbaca nyaman di area yang ada.
+    // Data di luar 5 terdekat tetap tersedia melalui "Lihat selengkapnya".
+    const BATAS_KARTU_UTAMA = 5;
+    const daftarUtama = daftar.slice(0, BATAS_KARTU_UTAMA);
+    const signature = daftar.map((a) => `${a.id_agenda}:${a.tanggal}:${a.jam_mulai}`).join(',');
+    if (content.dataset.signature !== signature) {
+      content.dataset.signature = signature;
+      content.innerHTML = `<div class="flex gap-4 h-full animate-fade-in">${daftarUtama.map((a) => buatKartu(a)).join('')}</div>`;
+      if (modalContent) modalContent.innerHTML = daftar.map((a) => buatKartu(a, true)).join('');
+      if (modalCount) modalCount.textContent = `${daftar.length} agenda akan datang`;
+    }
+
+    const adaSisa = daftar.length > BATAS_KARTU_UTAMA;
+    if (tombolLihatSemua) {
+      tombolLihatSemua.classList.toggle('hidden', !adaSisa);
+      tombolLihatSemua.classList.toggle('flex', adaSisa);
+    }
+
+    if (tombolLihatSemua && modal && !tombolLihatSemua.dataset.bound) {
+      tombolLihatSemua.dataset.bound = '1';
+      tombolLihatSemua.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      });
+    }
+    if (tombolTutup && modal && !tombolTutup.dataset.bound) {
+      tombolTutup.dataset.bound = '1';
+      tombolTutup.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      });
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) tombolTutup.click();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.classList.contains('hidden')) tombolTutup.click();
+      });
+    }
+  }};
