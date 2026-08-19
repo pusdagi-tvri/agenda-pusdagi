@@ -83,20 +83,51 @@ export function hitungAgendaBerlangsung(daftarAgenda, now) {
   return daftarAgenda.filter((a) => hitungStatusOtomatis(a, now) === STATUS_OTOMATIS.BERLANGSUNG).length;
 }
 
+/** Tambah N hari ke string tanggal ISO 'yyyy-mm-dd', kembalikan ISO baru. */
+export function tambahHari(tanggalStr, jumlahHari) {
+  const [t, b, h] = tanggalStr.split('-').map(Number);
+  const d = new Date(t, b - 1, h + jumlahHari);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * Tanggal-tanggal MENDATANG saja dari satu agenda (1 hari atau multi-hari) —
+ * bagian yang hari ini/sudah lewat DIKECUALIKAN (itu sudah tampil di "Agenda
+ * Hari Ini"), supaya agenda multi-hari yang sudah mulai tetap menampilkan sisa
+ * hari mendatangnya di sini, bukan hilang total begitu hari pertamanya tiba.
+ * Dibatasi jendela besok..+7hari dan maksimal 7 hari.
+ */
+export function hitungTanggalMendatang(agenda, todayISO) {
+  const besokISO = tambahHari(todayISO, 1);
+  const batasAkhirISO = tambahHari(todayISO, 7); // eksklusif
+  const selesai = agenda.tanggal_selesai || agenda.tanggal;
+  const mulaiEfektif = agenda.tanggal < besokISO ? besokISO : agenda.tanggal;
+
+  if (mulaiEfektif >= batasAkhirISO || selesai < besokISO) return [];
+
+  const hasil = [];
+  let tgl = mulaiEfektif;
+  for (let i = 0; i < 7; i++) {
+    if (tgl > selesai || tgl >= batasAkhirISO) break;
+    hasil.push(tgl);
+    tgl = tambahHari(tgl, 1);
+  }
+  return hasil;
+}
+
 /**
  * Agenda besok s/d 7 hari ke depan (TIDAK termasuk hari ini — itu sudah
- * ditampilkan di card lain), status belum dimulai. Dipakai bersama oleh
- * kartu statistik "Mendatang (7 Hari)" dan card "Agenda Mendatang" —
- * satu sumber kebenaran, supaya angka di kartu statistik selalu cocok
- * dengan jumlah kartu yang ditampilkan di bawahnya.
+ * ditampilkan di card lain), dihitung PER HARI (bukan per agenda) lewat
+ * hitungTanggalMendatang — satu sumber kebenaran, supaya angka di kartu
+ * statistik "Mendatang (7 Hari)" selalu cocok dengan jumlah kartu yang
+ * ditampilkan di card "Agenda Mendatang" (termasuk saat agenda multi-hari
+ * sudah mulai berjalan, sisa hari mendatangnya tetap terhitung).
  */
 export function hitungAgendaMendatang7Hari(daftarAgendaMendatang, now) {
-  const awalBesok = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  const batasAkhir = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7);
-  return daftarAgendaMendatang.filter((a) => {
-    const tglAgenda = gabungTanggalJam(a.tanggal, '00:00');
-    return hitungStatusOtomatis(a, now) === STATUS_OTOMATIS.BELUM_DIMULAI && tglAgenda >= awalBesok && tglAgenda < batasAkhir;
-  });
+  const todayISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  return daftarAgendaMendatang
+    .filter((a) => a.status !== 'Batal')
+    .flatMap((a) => hitungTanggalMendatang(a, todayISO));
 }
 
 /**
