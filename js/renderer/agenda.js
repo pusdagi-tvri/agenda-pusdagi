@@ -9,7 +9,7 @@
 import { STATUS_COLOR_CLASS, STATUS_OTOMATIS } from '../config.js';
 import { escapeHTML, gabungTanggalJam, formatTanggalIndonesia } from '../utils.js';
 import { hitungStatusOtomatis, hitungCountdown, cariAgendaBerlangsung, cariAgendaBerikutnya } from '../statusEngine.js';
-import { hitungAgendaMendatang7Hari } from '../executiveMetrics.js';
+import { hitungTanggalMendatang } from '../executiveMetrics.js';
 import { $ } from './domHelpers.js';
 
 const BULAN_SINGKAT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -25,33 +25,6 @@ function labelHariRelatif(tanggalStr, now) {
 function formatTanggalSingkat(tanggalStr) {
   const [, bulan, tgl] = tanggalStr.split('-').map(Number);
   return `${tgl} ${BULAN_SINGKAT[bulan - 1]}`;
-}
-
-/** Tambah N hari ke string tanggal ISO 'yyyy-mm-dd', kembalikan ISO baru. */
-function tambahHari(tanggalStr, jumlahHari) {
-  const [t, b, h] = tanggalStr.split('-').map(Number);
-  const d = new Date(t, b - 1, h + jumlahHari);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-/**
- * Memecah satu agenda multi-hari jadi beberapa "salinan" — satu per hari, judul dan
- * detail lain sama persis, cuma tanggalnya beda — supaya di Agenda Mendatang tampil
- * sebagai kartu terpisah per hari (bukan satu kartu dengan badge "s/d ..."). Dibatasi
- * maksimal 7 hari per agenda, dan tidak melewati batasAkhir (ujung jendela 7 hari ke depan).
- */
-function pecahAgendaMultiHari(agenda, batasAkhirISO) {
-  const multiHari = agenda.tanggal_selesai && agenda.tanggal_selesai !== agenda.tanggal;
-  if (!multiHari) return [agenda];
-
-  const hasil = [];
-  let tglBerjalan = agenda.tanggal;
-  for (let i = 0; i < 7; i++) {
-    if (tglBerjalan > agenda.tanggal_selesai || tglBerjalan >= batasAkhirISO) break;
-    hasil.push({ ...agenda, tanggal: tglBerjalan });
-    tglBerjalan = tambahHari(tglBerjalan, 1);
-  }
-  return hasil;
 }
 
 const WARNA_STATUS_HEX = {
@@ -256,9 +229,11 @@ export const AgendaRenderer = {
 
   /**
    * Menampilkan agenda 7 hari ke depan sebagai kartu horizontal — dipanggil
-   * hanya saat data berubah (siklus 15 detik). Filter besok-s/d-7-hari dipusatkan
-   * di executiveMetrics.js (hitungAgendaMendatang7Hari) supaya angka di kartu
-   * statistik atas selalu cocok dengan jumlah kartu yang tampil di sini.
+   * hanya saat data berubah (siklus 15 detik). Dihitung langsung dari data
+   * mentah (bukan lewat hitungAgendaMendatang7Hari) supaya agenda multi-hari
+   * yang SUDAH MULAI tetap menampilkan sisa hari mendatangnya di sini — bukan
+   * hilang total begitu hari pertamanya tiba (hari pertama itu memang sudah
+   * semestinya pindah ke "Agenda Hari Ini", bukan hilang dari dashboard).
    */
   renderAgendaMendatang(daftarAgendaMendatang, now) {
     const skeleton = $('agenda-mendatang-skeleton');
@@ -268,9 +243,12 @@ export const AgendaRenderer = {
     if (skeleton) skeleton.classList.add('hidden');
     content.classList.remove('hidden');
 
-    const belumDipecah = hitungAgendaMendatang7Hari(daftarAgendaMendatang, now);
-    const batasAkhirISO = tambahHari(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`, 7);
-    const daftar = belumDipecah.flatMap((a) => pecahAgendaMultiHari(a, batasAkhirISO)).slice(0, 5);
+    const todayISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const daftar = daftarAgendaMendatang
+      .filter((a) => a.status !== 'Batal')
+      .flatMap((a) => hitungTanggalMendatang(a, todayISO).map((tgl) => ({ ...a, tanggal: tgl })))
+      .sort((a, b) => a.tanggal.localeCompare(b.tanggal) || a.jam_mulai.localeCompare(b.jam_mulai))
+      .slice(0, 5);
 
     if (!daftar.length) {
       if (content.dataset.signature !== '') {
