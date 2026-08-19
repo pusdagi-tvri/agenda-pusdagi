@@ -130,3 +130,211 @@ html[data-theme="light"] #stage .card-shadow {
 }
 html[data-theme="light"] #stage .card-flat { border-color: rgba(15, 23, 42, 0.08); }
 html[data-theme="light"] #stage .stat-icon { box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.05); }
+
+/* -------------------------------------------------------------
+   7. POLISH KHUSUS PANEL KANAN MAIN CONTENT
+   Hanya memengaruhi:
+   - #card-berlangsung
+   - #card-berikutnya
+   - Statistik Kategori
+   Struktur, ukuran kolom, dan logika aplikasi tidak diubah.
+   ------------------------------------------------------------- */
+
+/* Permukaan panel kanan dibuat sedikit lebih berlapis dan rapi */
+#stage #card-berlangsung,
+#stage #card-berikutnya,
+#stage main > div > div:last-child > section:last-child {
+  position: relative;
+  isolation: isolate;
+  border-color: rgba(148, 163, 184, 0.13);
+}
+
+#stage #card-berlangsung::before,
+#stage #card-berikutnya::before,
+#stage main > div > div:last-child > section:last-child::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(37, 99, 235, 0.10), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,0.025), transparent 42%);
+}
+
+/* Garis aksen tipis di sisi kiri — memberi hierarki tanpa mengubah layout */
+#stage #card-berlangsung::after,
+#stage #card-berikutnya::after,
+#stage main > div > div:last-child > section:last-child::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22px;
+  bottom: 22px;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(180deg, rgba(96,165,250,.92), rgba(37,99,235,.28));
+  opacity: .75;
+}
+
+#stage #card-berlangsung::after {
+  background: linear-gradient(180deg, rgba(34,197,94,.95), rgba(34,197,94,.22));
+}
+
+#stage #card-berikutnya::after {
+  background: linear-gradient(180deg, rgba(245,158,11,.95), rgba(245,158,11,.22));
+}
+
+/* Sedang berlangsung: susunan informasi lebih lega dan fokus */
+#stage #berlangsung-content {
+  padding: 2px 4px 2px 2px;
+}
+
+#stage #berlangsung-content .badge-status {
+  width: fit-content;
+  min-height: 27px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  letter-spacing: .01em;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+}
+
+#stage #berlangsung-content h3 {
+  margin-top: 10px;
+  font-size: 22px;
+  line-height: 1.24;
+  letter-spacing: -0.02em;
+}
+
+#stage #berlangsung-content .progress-track-premium {
+  background: rgba(148,163,184,.14);
+  border: 1px solid rgba(148,163,184,.06);
+}
+
+/* Empty state card berlangsung — tidak lagi terlihat seperti teks mengambang */
+#stage #berlangsung-content:has(> p:only-child),
+#stage #berikutnya-content:has(> p:only-child) {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+#stage #berlangsung-content:has(> p:only-child) > p,
+#stage #berikutnya-content:has(> p:only-child) > p {
+  width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px dashed rgba(148,163,184,.15);
+  background: rgba(15,23,42,.20);
+  color: #94A3B8;
+  line-height: 1.45;
+}
+
+/* Agenda berikutnya: isi memenuhi tinggi kartu dan tidak menempel di atas */
+#stage #berikutnya-content:not(:has(> p:only-child)) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 3px 0 2px;
+}
+
+#stage #berikutnya-content > div:first-child {
+  margin-bottom: 9px;
+}
+
+#stage #berikutnya-content h3 {
+  margin-top: 6px;
+  font-size: 16px;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+/* Statistik kategori: header dan baris dibuat lebih rapat, presisi, dan mudah dipindai */
+#stage main > div > div:last-child > section:last-child h2 {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(148,163,184,.10);
+  font-size: 14px;
+  letter-spacing: .055em;
+}
+
+#stage main > div > div:last-child > section:last-child h2 svg {
+  width: 17px;
+  height: 17px;
+  padding: 2px;
+  border-radius: 6px;
+  background: rgba(37,99,235,.12);
+  box-sizing: content-box;
+}
+
+#stage #statistik-content {
+  padding-right: 2px;
+  overflow: hidden;
+}
+
+#stage #statistik-content > div {
+  min-height: 38px;
+  padding: 7px 10px;
+  margin: 2px 0;
+  border-bottom: 0;
+  border-radius: 10px;
+  background: rgba(255,255,255,.018);
+  transition: background .25s ease, transform .25s ease;
+}
+
+#stage #statistik-content > div:hover {
+  background: rgba(255,255,255,.045);
+  transform: translateX(2px);
+}
+
+#stage #statistik-content > div > span:first-child {
+  min-width: 0;
+  font-size: 13px;
+  color: #E2E8F0;
+}
+
+#stage #statistik-content > div > span:first-child .status-dot {
+  width: 8px;
+  height: 8px;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.025);
+}
+
+#stage #statistik-content > div > span:last-child {
+  min-width: 28px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: rgba(37,99,235,.10);
+  border: 1px solid rgba(96,165,250,.12);
+  color: #F8FAFC;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Light mode — tetap bersih tanpa mengubah karakter desain */
+html[data-theme="light"] #stage #card-berlangsung::before,
+html[data-theme="light"] #stage #card-berikutnya::before,
+html[data-theme="light"] #stage main > div > div:last-child > section:last-child::before {
+  background:
+    radial-gradient(circle at 92% 10%, rgba(37,99,235,.07), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,.7), transparent 46%);
+}
+
+html[data-theme="light"] #stage #berlangsung-content:has(> p:only-child) > p,
+html[data-theme="light"] #stage #berikutnya-content:has(> p:only-child) > p {
+  background: rgba(37,99,235,.025);
+  color: #64748B;
+}
+
+html[data-theme="light"] #stage #statistik-content > div {
+  background: rgba(15,23,42,.018);
+}
+
+html[data-theme="light"] #stage #statistik-content > div > span:first-child {
+  color: #334155;
+}
