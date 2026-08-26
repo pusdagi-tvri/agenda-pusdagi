@@ -9,7 +9,7 @@
 
 const LEBAR_DESAIN = 1920;
 const TINGGI_DESAIN = 1080;
-const BATAS_LEBAR_HP = 900; // sejalan dengan @media (max-width: 900px) di index.html
+const BATAS_LEBAR_HP = 640; // sejalan dengan @media (max-width: 640px) di index.html — sengaja rendah, khusus HP (bukan jendela desktop yang cuma sempit)
 
 function skalakan() {
   const stage = document.getElementById('stage');
