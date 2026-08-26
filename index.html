@@ -120,7 +120,7 @@
     0%   { transform: translateX(0%); }
     100% { transform: translateX(-50%); }
   }
-  .marquee-track { display: flex; width: max-content; animation: marquee 32s linear infinite; }
+  .marquee-track { display: flex; width: max-content; animation: marquee var(--durasi-marquee, 32s) linear infinite; }
 
   @keyframes shimmer {
     0%   { background-position: -400px 0; }
