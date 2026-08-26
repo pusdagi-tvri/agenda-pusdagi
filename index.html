@@ -24,12 +24,12 @@
   }
 
   /* ============================================================
-     MODE HP (lebar layar <= 900px) — kiosk 1920x1080 di-skala
+     MODE HP (lebar layar <= 640px) — kiosk 1920x1080 di-skala
      terlalu kecil untuk dibaca di HP, jadi di lebar ini layoutnya
      diganti total: tumpuk vertikal biasa, bisa di-scroll halaman,
      teks tidak lagi dipotong/dibatasi tinggi tetap.
      ============================================================ */
-  @media (max-width: 900px) {
+  @media (max-width: 640px) {
     html, body { overflow-y: auto !important; overflow-x: hidden !important; height: auto !important; }
 
     #stage {
