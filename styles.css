@@ -147,10 +147,6 @@ html[data-theme="light"] #stage .stat-icon { box-shadow: inset 0 0 0 1px rgba(15
   position: relative;
   isolation: isolate;
   border-color: rgba(148, 163, 184, 0.13);
-  /* Pengaman: tanpa ini, elemen flex/grid menolak mengecil di bawah lebar
-     alami kontennya — judul panjang bisa mendorong card melebar keluar
-     batas terlepas dari lebar layar. */
-  min-width: 0;
 }
 
 #stage #card-berlangsung::before,
@@ -375,4 +371,86 @@ html[data-theme="light"] #stage #statistik-content > div {
 
 html[data-theme="light"] #stage #statistik-content > div > span:first-child {
   color: #334155;
+}
+
+/* -------------------------------------------------------------
+   8. STABILISASI LAYOUT DESKTOP / KIOSK
+   Tidak mengubah struktur HTML maupun logika aplikasi. Bagian ini
+   hanya mengunci sizing/flex/grid agar proporsi 1920x1080 tetap
+   konsisten ketika browser melakukan scaling ke resolusi lain.
+   ------------------------------------------------------------- */
+
+/* Pastikan padding dan border selalu dihitung di dalam ukuran elemen. */
+#stage,
+#stage *,
+#stage *::before,
+#stage *::after {
+  box-sizing: border-box;
+}
+
+/* Cegah browser membuat kolom/grid melebar akibat isi teks panjang. */
+#stage main,
+#stage main > div,
+#stage main > div > section,
+#stage main > div > div,
+#stage main > div > div > section,
+#stage #agenda-hari-ini-content,
+#stage #berlangsung-content,
+#stage #berikutnya-content,
+#stage #statistik-content,
+#stage #agenda-mendatang-content {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Pertahankan komposisi referensi: 1248px kiri + 24px gap + sisa kanan,
+   tetapi izinkan kolom kanan menyusut secara benar tanpa overflow. */
+#stage main > .grid {
+  grid-template-columns: minmax(0, 1248px) minmax(0, 1fr) !important;
+}
+
+/* Panel kanan harus selalu memenuhi kolomnya, bukan mengikuti intrinsic width isi. */
+#stage main > .grid > div:last-child,
+#stage #card-berlangsung,
+#stage #card-berikutnya,
+#stage main > .grid > div:last-child > section:last-child {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Judul agenda panjang tidak boleh mendorong ukuran kartu/panel. */
+#stage #berlangsung-content h3,
+#stage #berikutnya-content h3,
+#stage #agenda-hari-ini-content h3,
+#stage #agenda-mendatang-content h3 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* Bar statistik atas tetap 7 kolom simetris setelah Progress Hari disembunyikan. */
+#stage section > .grid.grid-cols-8 {
+  width: 100%;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+}
+
+#stage section > .grid.grid-cols-8 > div {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Label kartu statistik tidak boleh menggeser nilai/ikon saat teks panjang. */
+#stage section > .grid.grid-cols-8 > div > div:last-child {
+  min-width: 0;
+}
+
+/* Agenda mendatang: distribusi kartu selalu rapi dan tinggi konsisten. */
+#stage #agenda-mendatang-content > div {
+  min-width: 0;
+}
+
+/* Stabilkan rasterisasi ketika #stage diskalakan oleh JS. */
+#stage {
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
