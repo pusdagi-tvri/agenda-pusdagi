@@ -342,7 +342,7 @@
           <div id="agenda-hari-ini-content" class="hidden fade-in flex-1 overflow-hidden"></div>
         </section>
 
-        <div class="flex flex-col gap-4 min-h-0 min-w-0">
+        <div class="flex flex-col gap-4 min-h-0">
 
           <section id="card-berlangsung"
                    class="glass card-shadow card-hover rounded-[20px] p-6 relative overflow-hidden"
@@ -385,11 +385,7 @@
     <section class="px-8" style="height:250px;">
       <div class="card-flat card-shadow rounded-[20px] p-6 h-full flex flex-col">
         <div class="flex items-center justify-between mb-4 shrink-0">
-          <h2 class="text-base font-semibold text-[#94A3B8] tracking-wide uppercase">Agenda Mendatang</h2>
-          <button id="agenda-mendatang-lihat-semua" class="hidden items-center gap-1.5 text-[13px] font-medium text-[#60A5FA] hover-brighten">
-            Lihat Selengkapnya
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
+          <h2 class="text-base font-semibold text-[#94A3B8] tracking-wide uppercase">Agenda Mendatang (7 Hari ke Depan)</h2>
         </div>
         <div class="flex-1 relative">
           <div id="agenda-mendatang-skeleton" class="flex gap-4 h-full">
@@ -402,22 +398,6 @@
         </div>
       </div>
     </section>
-
-    <!-- MODAL: Semua Agenda Mendatang (tanpa batas jumlah/hari) -->
-    <div id="agenda-mendatang-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-10" style="background:rgba(0,0,0,0.6);">
-      <div class="card-flat card-shadow rounded-[24px] w-full flex flex-col" style="max-width:1400px; max-height:calc(100vh - 80px);">
-        <div class="flex items-center justify-between p-6 pb-4 shrink-0">
-          <div>
-            <h2 class="text-heading text-xl">Semua Agenda Mendatang</h2>
-            <p id="agenda-mendatang-modal-count" class="text-caption normal-case tracking-normal text-[13px] mt-1"></p>
-          </div>
-          <button id="agenda-mendatang-modal-tutup" class="w-9 h-9 rounded-full flex items-center justify-center hover-brighten" style="background:rgba(255,255,255,0.06);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-          </button>
-        </div>
-        <div id="agenda-mendatang-modal-content" class="grid gap-4 overflow-y-auto p-6 pt-2" style="grid-template-columns: repeat(3, 1fr);"></div>
-      </div>
-    </div>
 
     <!-- RUNNING TEXT FOOTER (1020-1080px) -->
     <footer class="card-flat card-shadow flex items-center px-3 mt-3" style="height:44px;">
