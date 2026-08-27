@@ -454,3 +454,401 @@ html[data-theme="light"] #stage #statistik-content > div > span:first-child {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+
+/* =============================================================
+   9. RESPONSIVE TABLET & MOBILE
+   Aktif hanya <= 1024px. Layout desktop/kiosk > 1024px tetap identik.
+   ============================================================= */
+@media (max-width: 1024px) {
+  html,
+  body {
+    width: 100%;
+    min-height: 100%;
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    min-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  #stage {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100dvh;
+    transform: none !important;
+    transform-origin: initial !important;
+    overflow: visible !important;
+  }
+
+  /* Header: dua baris yang rapi, tanpa memaksa lebar desktop. */
+  #stage > header {
+    height: auto !important;
+    min-height: 88px;
+    margin: 0;
+    border-radius: 0;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  #stage > header > div {
+    height: auto !important;
+    min-height: 88px;
+    padding: 14px 18px !important;
+    gap: 14px;
+    align-items: center;
+  }
+
+  #stage > header > div > div:first-child {
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 10px !important;
+  }
+
+  #stage > header > div > div:first-child > div:first-child {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 13px !important;
+  }
+
+  #stage > header h1 {
+    font-size: 17px !important;
+    line-height: 1.18 !important;
+    letter-spacing: -0.02em;
+  }
+
+  #stage > header h1 + p {
+    font-size: 10px !important;
+    line-height: 1.35;
+    margin-top: 3px !important;
+    max-width: 48ch;
+  }
+
+  #stage > header > div > div:last-child {
+    gap: 9px !important;
+    flex: 0 0 auto;
+  }
+
+  #stage #auto-refresh-indicator {
+    display: none !important;
+  }
+
+  #stage #jam-digital {
+    font-size: 20px !important;
+    line-height: 1.1;
+  }
+
+  #stage #tanggal-indonesia {
+    max-width: 135px;
+    font-size: 9px !important;
+    line-height: 1.25;
+  }
+
+  #stage #tombol-tema {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+  }
+
+  /* Executive statistics: 2 kolom, touch-friendly, tanpa horizontal scroll. */
+  #stage > section:nth-of-type(1) {
+    height: auto !important;
+    margin-top: 12px !important;
+    padding: 0 16px !important;
+  }
+
+  #stage section > .grid.grid-cols-8 {
+    height: auto !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  #stage section > .grid.grid-cols-8 > div {
+    min-height: 78px;
+    padding: 12px !important;
+    border-radius: 16px !important;
+  }
+
+  #stage section > .grid.grid-cols-8 > div:has(#exec-progress-kerja-label) {
+    grid-column: 1 / -1;
+    min-height: 64px;
+  }
+
+  #stage .stat-icon {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 12px !important;
+  }
+
+  #stage section > .grid.grid-cols-8 p[id^="exec-"]:not([id$="label"]) {
+    font-size: 22px !important;
+  }
+
+  /* Main: desktop 2 kolom menjadi alur vertikal natural. */
+  #stage > main {
+    height: auto !important;
+    padding: 14px 16px !important;
+  }
+
+  #stage main > .grid {
+    display: flex !important;
+    flex-direction: column;
+    height: auto !important;
+    gap: 12px !important;
+  }
+
+  #stage main > .grid > section:first-child {
+    min-height: 300px;
+    height: auto !important;
+    padding: 18px !important;
+    border-radius: 18px !important;
+    overflow: visible !important;
+  }
+
+  #stage main > .grid > section:first-child > div:first-child {
+    margin-bottom: 14px !important;
+    gap: 10px;
+  }
+
+  #stage main > .grid > section:first-child h2 {
+    font-size: 16px !important;
+  }
+
+  #stage #tanggal-timeline {
+    font-size: 10px !important;
+    text-align: right;
+  }
+
+  #stage #agenda-hari-ini-content {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  #stage .timeline-row {
+    padding-left: 24px !important;
+  }
+
+  /* Panel kanan menjadi tiga kartu penuh, konsisten. */
+  #stage main > .grid > div:last-child {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px !important;
+    width: 100%;
+  }
+
+  #stage #card-berlangsung,
+  #stage #card-berikutnya,
+  #stage main > .grid > div:last-child > section:last-child {
+    height: auto !important;
+    min-height: 148px;
+    padding: 18px !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+  }
+
+  #stage #card-berlangsung {
+    min-height: 180px;
+  }
+
+  #stage #berlangsung-content,
+  #stage #berikutnya-content {
+    height: auto !important;
+    min-height: 108px;
+  }
+
+  #stage #berlangsung-content h3 {
+    font-size: 18px !important;
+  }
+
+  #stage #berikutnya-content h3 {
+    font-size: 15px !important;
+  }
+
+  /* Statistik kategori: tetap langsung terlihat, 2 kolom. */
+  #stage main > .grid > div:last-child > section:last-child {
+    min-height: 150px;
+  }
+
+  #stage #statistik-content {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: minmax(36px, auto) !important;
+    gap: 7px !important;
+    overflow: visible !important;
+  }
+
+  #stage #statistik-content > div {
+    min-height: 36px !important;
+    padding: 7px 9px !important;
+  }
+
+  #stage #statistik-content > div > span:first-child {
+    font-size: 11px !important;
+  }
+
+  /* Agenda mendatang: 1 kolom di HP/tablet agar judul dan detail terbaca. */
+  #stage > section:nth-of-type(2) {
+    height: auto !important;
+    padding: 0 16px !important;
+    margin-bottom: 14px;
+  }
+
+  #stage > section:nth-of-type(2) > div {
+    height: auto !important;
+    min-height: 220px;
+    padding: 18px !important;
+    border-radius: 18px !important;
+  }
+
+  #stage > section:nth-of-type(2) > div > div:first-child {
+    margin-bottom: 12px !important;
+  }
+
+  #stage > section:nth-of-type(2) h2 {
+    font-size: 12px !important;
+    line-height: 1.35;
+  }
+
+  #stage #agenda-mendatang-content {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  #stage #agenda-mendatang-content > div,
+  #stage #agenda-mendatang-content > article {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Renderer lama memakai flex row; paksa daftar menjadi vertikal tanpa ubah JS. */
+  #stage #agenda-mendatang-content[class*="flex"],
+  #stage #agenda-mendatang-content > div[class*="flex"] {
+    flex-direction: column !important;
+  }
+
+  #stage #agenda-mendatang-skeleton {
+    height: auto !important;
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 10px !important;
+  }
+
+  #stage #agenda-mendatang-skeleton > div {
+    min-height: 105px;
+  }
+
+  /* Footer tidak mengambil ruang berlebihan di layar kecil. */
+  #stage > footer {
+    height: 42px !important;
+    margin-top: 0 !important;
+    padding: 0 12px !important;
+    position: relative;
+  }
+
+  #stage > footer > div:last-child {
+    display: none !important;
+  }
+
+  #stage .marquee-track span {
+    font-size: 11px !important;
+  }
+
+  /* Hover desktop tidak relevan di touch device. */
+  #stage .card-hover:hover {
+    transform: none;
+  }
+}
+
+/* HP kecil: optimasi kepadatan informasi dan header. */
+@media (max-width: 640px) {
+  #stage > header > div {
+    padding: 12px 14px !important;
+  }
+
+  #stage > header h1 {
+    font-size: 15px !important;
+    max-width: 220px;
+  }
+
+  #stage > header h1 + p {
+    display: none;
+  }
+
+  #stage #jam-digital {
+    font-size: 17px !important;
+  }
+
+  #stage #tanggal-indonesia {
+    display: none;
+  }
+
+  #stage section > .grid.grid-cols-8 {
+    gap: 8px !important;
+  }
+
+  #stage section > .grid.grid-cols-8 > div {
+    min-height: 72px;
+    padding: 10px !important;
+    gap: 9px !important;
+  }
+
+  #stage .stat-icon {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  #stage section > .grid.grid-cols-8 > div p:first-of-type {
+    font-size: 9px !important;
+    line-height: 1.2;
+  }
+
+  #stage section > .grid.grid-cols-8 p[id^="exec-"]:not([id$="label"]) {
+    font-size: 20px !important;
+  }
+
+  #stage main > .grid > section:first-child,
+  #stage #card-berlangsung,
+  #stage #card-berikutnya,
+  #stage main > .grid > div:last-child > section:last-child,
+  #stage > section:nth-of-type(2) > div {
+    border-radius: 16px !important;
+  }
+
+  #stage #statistik-content {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* Layar sangat sempit (mis. WebView 320–360px). */
+@media (max-width: 380px) {
+  #stage > header h1 {
+    max-width: 170px;
+    font-size: 14px !important;
+  }
+
+  #stage #jam-digital {
+    display: none;
+  }
+
+  #stage section > .grid.grid-cols-8 {
+    grid-template-columns: 1fr !important;
+  }
+
+  #stage section > .grid.grid-cols-8 > div:has(#exec-progress-kerja-label) {
+    grid-column: auto;
+  }
+
+  #stage #statistik-content {
+    grid-template-columns: 1fr !important;
+  }
+}
