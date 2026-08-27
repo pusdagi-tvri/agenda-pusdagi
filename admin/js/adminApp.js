@@ -68,10 +68,14 @@ let arsipLengkap = []; // disimpan supaya pencarian bisa filter tanpa fetch ulan
 
 /** Satu panggilan (/dashboard) untuk mengisi dropdown pimpinan/ruangan, daftar agenda, dan arsip rapat. */
 async function muatData() {
-  const { pimpinan, ruangan, agenda, arsip } = await AdminApiService.ambilRingkasan();
+  const { pimpinan, ruangan, agenda, arsip, kecepatanTeks } = await AdminApiService.ambilRingkasan();
   AdminRenderer.isiDatalist('datalist-pimpinan', pimpinan, 'nama_lengkap');
   AdminRenderer.isiDatalist('datalist-ruangan', ruangan, 'nama_ruangan');
   AdminRenderer.renderDaftarAgenda(agenda, mulaiEdit, batalkanAgenda);
+
+  // Jangan timpa kalau field-nya sedang aktif diketik (fokus) — hindari mengganggu input berjalan.
+  const inputKecepatan = document.getElementById('form-kecepatan-teks');
+  if (inputKecepatan && document.activeElement !== inputKecepatan) inputKecepatan.value = kecepatanTeks;
 
   arsipLengkap = arsip;
   terapkanPencarianArsip(); // supaya kata kunci yang sudah diketik tetap berlaku setelah refresh data
@@ -120,12 +124,52 @@ function tanganiLogout() {
   AdminRenderer.tampilkanLogin();
 }
 
+/** Toggle mode gelap/terang — disimpan di localStorage supaya pilihan bertahan lintas refresh. */
+function inisialisasiToggleTemaAdmin() {
+  const tombol = document.getElementById('tombol-tema-admin');
+  if (!tombol) return;
+
+  tombol.addEventListener('click', () => {
+    const sudahGelap = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (sudahGelap) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('tema-admin', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('tema-admin', 'dark');
+    }
+  });
+}
+
+/** Menyimpan pengaturan kecepatan running teks (1-10) ke sheet Pengaturan. */
+async function simpanKecepatanTeks() {
+  const input = document.getElementById('form-kecepatan-teks');
+  const pesan = document.getElementById('pesan-kecepatan');
+  let nilai = parseInt(input.value, 10);
+
+  if (isNaN(nilai) || nilai < 1 || nilai > 10) {
+    pesan.textContent = 'Isi angka 1-10.';
+    pesan.style.color = '#DC2626';
+    return;
+  }
+
+  pesan.textContent = 'Menyimpan…';
+  pesan.style.color = '#6B7280';
+  await AdminApiService.simpanKecepatanTeks(nilai);
+  setTimeout(() => {
+    pesan.textContent = 'Tersimpan.';
+    pesan.style.color = '#059669';
+  }, 2000);
+}
+
 function init() {
+  inisialisasiToggleTemaAdmin();
   document.getElementById('form-login').addEventListener('submit', tanganiSubmitLogin);
   document.getElementById('form-agenda').addEventListener('submit', tanganiSubmitForm);
   document.getElementById('tombol-reset-form').addEventListener('click', () => AdminRenderer.resetForm());
   document.getElementById('tombol-logout').addEventListener('click', tanganiLogout);
   document.getElementById('cari-arsip').addEventListener('input', terapkanPencarianArsip);
+  document.getElementById('tombol-simpan-kecepatan').addEventListener('click', simpanKecepatanTeks);
 
   if (AdminAuth.sudahLogin()) {
     bukaPanel();
