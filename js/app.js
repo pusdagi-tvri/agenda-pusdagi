@@ -17,6 +17,7 @@ import { ConnectionMonitor } from './connectionMonitor.js';
 import { ClockService } from './clockService.js';
 import { Renderer } from './renderer.js';
 import { aktifkanAutoScale } from './stageScaler.js';
+import { clamp } from './utils.js';
 
 /** State aplikasi — sengaja disimpan sesederhana mungkin (bukan store/reactive framework). */
 const state = {
@@ -77,6 +78,8 @@ async function muatDataDariServer() {
     const daftarAgenda = normalisasiAgenda(data.daftar_agenda_hari_ini || [], lookupRuangan, lookupPimpinan);
     const agendaMendatang = normalisasiAgenda(data.daftar_agenda_mendatang || [], lookupRuangan, lookupPimpinan);
 
+    terapkanKecepatanMarquee(data.kecepatan_running_teks);
+
     state.daftarAgendaTerakhir = daftarAgenda;
     state.agendaMendatang = agendaMendatang;
     state.sudahAdaData = true;
@@ -96,6 +99,18 @@ async function muatDataDariServer() {
 }
 
 /** Membuat peta id_ruangan → nama_ruangan, untuk data lama yang id_ruangan-nya masih berupa kode. */
+/** Mengubah kecepatan (1-10, makin besar makin cepat) jadi durasi animasi (detik, makin kecil makin cepat),
+ *  lalu diterapkan ke variabel CSS --durasi-marquee yang dipakai .marquee-track. */
+let kecepatanTerakhirDiterapkan = null;
+function terapkanKecepatanMarquee(kecepatanMentah) {
+  const kecepatan = clamp(parseInt(kecepatanMentah, 10) || 5, 1, 10);
+  if (kecepatan === kecepatanTerakhirDiterapkan) return; // hindari restart animasi tiap refresh kalau nilainya sama
+  kecepatanTerakhirDiterapkan = kecepatan;
+
+  const durasiDetik = 70 - kecepatan * 6; // kecepatan 1 → 64 detik (lambat), kecepatan 10 → 10 detik (cepat)
+  document.documentElement.style.setProperty('--durasi-marquee', `${durasiDetik}s`);
+}
+
 function buatLookupRuangan(daftarRuangan) {
   const peta = {};
   daftarRuangan.forEach((r) => { peta[r.id_ruangan] = r.nama_ruangan; });
