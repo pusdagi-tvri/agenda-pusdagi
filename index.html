@@ -21,68 +21,17 @@
     padding: 0;
     background: var(--color-bg);
     overflow: hidden;
+    /* Pengaman keras — apa pun aturan lain yang mungkin ada (mis. dari styles.css),
+       konten tidak akan pernah bisa melebar melebihi batas layar. */
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
 
-  /* ============================================================
-     MODE HP — kiosk 1920x1080 di-skala terlalu kecil untuk dibaca
-     di HP, jadi layoutnya diganti total: tumpuk vertikal biasa,
-     bisa di-scroll halaman, teks tidak lagi dipotong/dibatasi
-     tinggi tetap. AKTIF LEWAT KELAS "mode-hp" DI <html> (diatur
-     stageScaler.js berdasar window.innerWidth) — BUKAN @media,
-     supaya tidak bergantung/terpengaruh pengaturan viewport meta
-     (yang tetap dikunci width=1920 khusus untuk layar kiosk).
-     ============================================================ */
-  html.mode-hp, html.mode-hp body { overflow-y: auto !important; overflow-x: hidden !important; height: auto !important; }
-
-  html.mode-hp #stage {
-    transform: none !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 100vh;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-
-  html.mode-hp #stage > header,
-  html.mode-hp #stage > section,
-  html.mode-hp #stage > main,
-  html.mode-hp #stage > footer {
-    height: auto !important;
-    min-height: 0 !important;
-  }
-
-  html.mode-hp #stage > header { flex-direction: column; align-items: flex-start !important; gap: 12px; padding: 16px !important; }
-  html.mode-hp #stage > header .flex.items-center.gap-6 { width: 100%; justify-content: space-between; }
-
-  /* Baris statistik: dari 8 kolom sejajar jadi grid 2 kolom yang wrap */
-  html.mode-hp #stage > section:first-of-type .grid.grid-cols-8 {
-    display: grid !important; grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important; height: auto !important;
-  }
-
-  /* Grid utama (timeline + kolom kanan): dari 2 kolom lebar tetap jadi tumpuk 1 kolom */
-  html.mode-hp main .grid.h-full {
-    display: flex !important; flex-direction: column !important;
-    grid-template-columns: none !important; height: auto !important;
-  }
-  html.mode-hp main .grid.h-full > * { width: 100% !important; height: auto !important; min-height: 0 !important; }
-
-  /* Timeline Agenda Hari Ini: hilangkan batas tinggi & scroll internal — biar ikut scroll halaman */
-  html.mode-hp #agenda-hari-ini-content, html.mode-hp #agenda-hari-ini-content > div {
-    max-height: none !important; height: auto !important; overflow: visible !important;
-  }
-
-  /* Judul & keterangan: jangan dipotong "..." lagi, biarkan wrap penuh */
-  html.mode-hp .truncate { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
-  html.mode-hp #card-berikutnya h3 { -webkit-line-clamp: unset !important; display: block !important; }
-  html.mode-hp #card-berikutnya { overflow: visible !important; }
-
-  /* Agenda Mendatang: dari baris horizontal sejajar jadi tumpuk vertikal */
-  html.mode-hp #agenda-mendatang-content { flex-direction: column !important; }
-  html.mode-hp #agenda-mendatang-content > div { width: 100% !important; }
-
-  /* Footer running text: teks penuh boleh wrap, tidak perlu dipaksa 1 baris di HP */
-  html.mode-hp #marquee-a, html.mode-hp #marquee-b { white-space: normal !important; }
+  /* Catatan: tampilan tablet/HP sekarang SEPENUHNYA ditangani oleh @media
+     query di styles.css (bagian "8. RESPONSIVE TABLET & MOBILE") — sistem
+     class "mode-hp" yang tadinya di sini SUDAH DIHAPUS karena bentrok
+     dengan sistem itu (dua-duanya sama-sama mengatur #stage di rentang
+     lebar yang tumpang tindih, salah satunya menang secara acak). */
 
   .tabular-nums { font-variant-numeric: tabular-nums; }
 
