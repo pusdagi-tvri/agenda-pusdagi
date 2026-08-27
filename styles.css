@@ -147,6 +147,10 @@ html[data-theme="light"] #stage .stat-icon { box-shadow: inset 0 0 0 1px rgba(15
   position: relative;
   isolation: isolate;
   border-color: rgba(148, 163, 184, 0.13);
+  /* Pengaman: tanpa ini, elemen flex/grid menolak mengecil di bawah lebar
+     alami kontennya — judul panjang bisa mendorong card melebar keluar
+     batas terlepas dari lebar layar. */
+  min-width: 0;
 }
 
 #stage #card-berlangsung::before,
