@@ -155,11 +155,16 @@ async function simpanKecepatanTeks() {
 
   pesan.textContent = 'Menyimpan…';
   pesan.style.color = '#6B7280';
-  await AdminApiService.simpanKecepatanTeks(nilai);
-  setTimeout(() => {
-    pesan.textContent = 'Tersimpan.';
-    pesan.style.color = '#059669';
-  }, 2000);
+  try {
+    await AdminApiService.simpanKecepatanTeks(nilai);
+    setTimeout(() => {
+      pesan.textContent = 'Tersimpan.';
+      pesan.style.color = '#059669';
+    }, 2000);
+  } catch (err) {
+    pesan.textContent = 'Gagal menyimpan: ' + err.message;
+    pesan.style.color = '#DC2626';
+  }
 }
 
 function init() {

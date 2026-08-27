@@ -94,7 +94,8 @@ export const AdminApiService = {
       // daftar_agenda_mendatang (versi Service_Dashboard.gs yang lebih lama) —
       // supaya Admin Panel tidak selalu kosong hanya karena satu field itu absen.
       agenda: data.daftar_agenda_mendatang || data.daftar_agenda_hari_ini || [],
-      arsip: data.daftar_arsip_rapat || []
+      arsip: data.daftar_arsip_rapat || [],
+      kecepatanTeks: data.kecepatan_running_teks || '5'
     };
   },
 
@@ -108,5 +109,9 @@ export const AdminApiService = {
 
   batalkanAgenda(idAgenda) {
     return kirimForm({ action: 'cancelAgenda', id_agenda: idAgenda });
+  },
+
+  simpanKecepatanTeks(nilai) {
+    return kirimForm({ action: 'updateSetting', key: 'kecepatan_running_teks', value: String(nilai) });
   }
 };
