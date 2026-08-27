@@ -1414,3 +1414,18 @@ html[data-theme="light"] #stage #statistik-content > div > span:first-child {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* =============================================================
+   MOBILE FIX — agenda mendatang skeleton
+   Jangan pernah memaksa skeleton tampil setelah JS memberi class hidden.
+   Desktop tidak terpengaruh.
+   ============================================================= */
+@media (max-width: 768px) {
+  #stage #agenda-mendatang-skeleton.hidden {
+    display: none !important;
+  }
+
+  #stage #agenda-mendatang-content.hidden {
+    display: none !important;
+  }
+}
