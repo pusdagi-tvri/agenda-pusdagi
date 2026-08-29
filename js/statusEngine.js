@@ -9,7 +9,7 @@
  */
 
 import { STATUS_OTOMATIS } from './config.js';
-import { gabungTanggalJam, formatDurasiSingkat, clamp } from './utils.js';
+import { gabungTanggalJam, formatTanggalISO, formatDurasiSingkat, clamp } from './utils.js';
 
 /**
  * Menghitung status otomatis satu agenda pada waktu tertentu.
@@ -17,18 +17,37 @@ import { gabungTanggalJam, formatDurasiSingkat, clamp } from './utils.js';
  * @param {Date} now - waktu acuan (biasanya waktu sekarang)
  * @returns {string} salah satu nilai STATUS_OTOMATIS
  */
+/**
+ * Menghitung rentang waktu MULAI-SELESAI yang efektif berlaku untuk agenda pada
+ * `now` — untuk agenda multi-hari yang sedang aktif hari ini, dipakai jam_mulai/
+ * jam_selesai HARI INI (bukan tanggal_mulai/tanggal_selesai keseluruhan), supaya
+ * statusnya di-reset tiap hari alih-alih "berlangsung" nonstop sepanjang rentang.
+ */
+function hitungRentangEfektif(agenda, now) {
+  const todayISO = formatTanggalISO(now);
+  const tglMulai = agenda.tanggal;
+  const tglSelesai = agenda.tanggal_selesai || agenda.tanggal;
+
+  if (todayISO >= tglMulai && todayISO <= tglSelesai) {
+    return {
+      mulai: gabungTanggalJam(todayISO, agenda.jam_mulai),
+      selesai: gabungTanggalJam(todayISO, agenda.jam_selesai)
+    };
+  }
+  return {
+    mulai: gabungTanggalJam(tglMulai, agenda.jam_mulai),
+    selesai: gabungTanggalJam(tglSelesai, agenda.jam_selesai)
+  };
+}
+
 export function hitungStatusOtomatis(agenda, now) {
   if (agenda.status === 'Batal') return STATUS_OTOMATIS.BATAL;
 
-  const mulai = gabungTanggalJam(agenda.tanggal, agenda.jam_mulai);
-  // tanggal_selesai (bukan tanggal mulai) dipakai untuk agenda multi-hari — fallback
-  // ke tanggal mulai kalau kosong/tidak ada (agenda 1 hari biasa, atau data lama).
-  const selesai = gabungTanggalJam(agenda.tanggal_selesai || agenda.tanggal, agenda.jam_selesai);
-
-  if (!mulai || !selesai) return STATUS_OTOMATIS.BELUM_DIMULAI; // data tidak lengkap, fallback aman
+  const { mulai, selesai } = hitungRentangEfektif(agenda, now);
+  if (!mulai || !selesai) return STATUS_OTOMATIS.BELUM_DIMULAI;
 
   if (now < mulai) return STATUS_OTOMATIS.BELUM_DIMULAI;
-  if (now >= mulai && now <= selesai) return STATUS_OTOMATIS.BERLANGSUNG;
+  if (now <= selesai) return STATUS_OTOMATIS.BERLANGSUNG;
   return STATUS_OTOMATIS.SELESAI;
 }
 
@@ -40,8 +59,7 @@ export function hitungStatusOtomatis(agenda, now) {
  */
 export function hitungCountdown(agenda, now) {
   const status = hitungStatusOtomatis(agenda, now);
-  const mulai = gabungTanggalJam(agenda.tanggal, agenda.jam_mulai);
-  const selesai = gabungTanggalJam(agenda.tanggal_selesai || agenda.tanggal, agenda.jam_selesai);
+  const { mulai, selesai } = hitungRentangEfektif(agenda, now);
 
   if (status === STATUS_OTOMATIS.BELUM_DIMULAI && mulai) {
     return { status, label: `${formatDurasiSingkat(mulai - now)} lagi`, persenBerjalan: 0 };

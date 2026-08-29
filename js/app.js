@@ -75,7 +75,9 @@ async function muatDataDariServer() {
     const data = await ambilDataDashboard();
     const lookupRuangan = buatLookupRuangan(data.daftar_ruangan || []);
     const lookupPimpinan = buatLookupPimpinan(data.daftar_pimpinan || []);
-    const daftarAgenda = normalisasiAgenda(data.daftar_agenda_hari_ini || [], lookupRuangan, lookupPimpinan);
+    const daftarAgenda = saringMultiHariDiLibur(
+      normalisasiAgenda(data.daftar_agenda_hari_ini || [], lookupRuangan, lookupPimpinan)
+    );
     const agendaMendatang = normalisasiAgenda(data.daftar_agenda_mendatang || [], lookupRuangan, lookupPimpinan);
 
     terapkanKecepatanMarquee(data.kecepatan_running_teks);
@@ -109,6 +111,21 @@ function terapkanKecepatanMarquee(kecepatanMentah) {
 
   const durasiDetik = 70 - kecepatan * 6; // kecepatan 1 → 64 detik (lambat), kecepatan 10 → 10 detik (cepat)
   document.documentElement.style.setProperty('--durasi-marquee', `${durasiDetik}s`);
+}
+
+/**
+ * Agenda multi-hari tidak "jalan" di hari libur (Sabtu/Minggu, per JAM_KERJA_PER_HARI)
+ * meski tanggalnya masih di dalam rentang tanggal_mulai..tanggal_selesai — jadi tidak
+ * seharusnya tampil di "Agenda Hari Ini" pada hari itu. Agenda 1 hari yang memang
+ * sengaja dijadwalkan di hari libur tetap tampil seperti biasa (tidak disaring).
+ */
+function saringMultiHariDiLibur(daftarAgenda) {
+  const hariIniLibur = CONFIG.JAM_KERJA_PER_HARI[new Date().getDay()] === null;
+  if (!hariIniLibur) return daftarAgenda;
+  return daftarAgenda.filter((a) => {
+    const multiHari = a.tanggal_selesai && a.tanggal_selesai !== a.tanggal;
+    return !multiHari;
+  });
 }
 
 function buatLookupRuangan(daftarRuangan) {

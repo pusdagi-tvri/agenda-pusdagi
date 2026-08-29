@@ -53,6 +53,11 @@ export function gabungTanggalJam(tanggalStr, jamStr) {
   return new Date(tahun, bulan - 1, tanggal, jam, menit, 0);
 }
 
+/** Mengubah objek Date jadi string ISO 'yyyy-mm-dd' (pakai tanggal lokal, bukan UTC). */
+export function formatTanggalISO(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 /** Mengubah selisih milidetik menjadi label countdown yang mudah dibaca, contoh: "1 jam 24 menit" */
 export function formatDurasiSingkat(ms) {
   if (ms <= 0) return '0 menit';
