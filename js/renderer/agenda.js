@@ -55,13 +55,11 @@ function buatSlideStaf(daftarStaf) {
 
 /** Satu kartu profil (foto + nama + jabatan) — pakai avatar inisial kalau kolom foto kosong. */
 function kartuStaf(staf, besar) {
-  const tinggiKartu = besar ? 'h-[360px]' : 'h-[300px]';
-  const lebarFoto = besar ? 'w-[220px]' : 'w-[180px]';
-  const lebarKartu = besar ? 'max-w-[520px]' : 'max-w-[420px]';
+  const modifierBesar = besar ? 'kartu-staf--besar' : '';
 
   const fotoHTML = staf.foto
-    ? `<img src="assets/staf/${escapeHTML(staf.foto)}" alt="${escapeHTML(staf.nama)}" class="${lebarFoto} h-full object-cover shrink-0" />`
-    : `<div class="${lebarFoto} h-full flex items-center justify-center text-5xl font-bold text-white shrink-0" style="background:#2563EB;">${escapeHTML((staf.nama || '?').charAt(0).toUpperCase())}</div>`;
+    ? `<img src="assets/staf/${escapeHTML(staf.foto)}" alt="${escapeHTML(staf.nama)}" class="kartu-staf-foto object-cover shrink-0" />`
+    : `<div class="kartu-staf-foto flex items-center justify-center text-5xl font-bold text-white shrink-0" style="background:#2563EB;">${escapeHTML((staf.nama || '?').charAt(0).toUpperCase())}</div>`;
 
   const kontakHTML = (staf.email || staf.hp) ? `
     <div class="flex flex-col gap-1.5 mt-3">
@@ -83,10 +81,11 @@ function kartuStaf(staf, besar) {
   ` : '';
 
   return `
-    <div class="flex ${tinggiKartu} ${lebarKartu} w-full rounded-xl overflow-hidden" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);">
+    <div class="kartu-staf ${modifierBesar} w-full rounded-xl overflow-hidden" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);">
       ${fotoHTML}
-      <div class="flex-1 min-w-0 flex flex-col justify-center p-6">
+      <div class="kartu-staf-info flex-1 min-w-0 flex flex-col justify-center p-6">
         <div class="w-10 h-[3px] rounded-full mb-3" style="background:#2563EB;"></div>
+
         <p class="text-[22px] font-bold text-[#F8FAFC] leading-tight">${escapeHTML(staf.nama)}</p>
         <p class="text-[14px] font-medium mt-1" style="color:#60A5FA;">${escapeHTML(staf.jabatan || '')}</p>
         ${kontakHTML}
@@ -101,7 +100,7 @@ function tampilkanSlideStaf(content, slides, indeks) {
   if (!slide) return;
 
   const htmlSlide = `
-    <div class="flex items-center justify-center h-full gap-10">
+    <div class="slide-staf flex items-center justify-center h-full gap-10">
       ${slide.map((s) => kartuStaf(s, slide.length === 1)).join('')}
     </div>
   `;
