@@ -98,6 +98,11 @@
   /* Mode HP/tablet sempit — kartu ditumpuk vertikal (foto di atas, bukan di samping),
      lebar & tinggi jadi otomatis mengikuti konten, bukan piksel tetap ala kiosk. */
   @media (max-width: 768px) {
+    /* Position:absolute (dipakai mekanisme dissolve karosel staf) tidak ikut memberi
+       tinggi ke elemen pembungkusnya — tanpa ini, #agenda-hari-ini-content bisa
+       kolaps ke tinggi 0 di mode HP (kontennya "ada" tapi tak kelihatan sama sekali). */
+    #agenda-hari-ini-content { min-height: 420px !important; }
+
     .slide-staf { flex-direction: column; gap: 20px !important; }
     .kartu-staf, .kartu-staf--besar {
       flex-direction: column; height: auto; max-width: 100%;
