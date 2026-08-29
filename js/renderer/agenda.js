@@ -40,8 +40,11 @@ let karoselStafIndeks = 0;
 /** Memecah daftar staf jadi slide: Kapusdagi sendiri (1 slide), sisanya berpasangan 2-2. */
 function buatSlideStaf(daftarStaf) {
   if (!daftarStaf || !daftarStaf.length) return [];
-  const kapusdagi = daftarStaf.find((s) => s.peran === 'Kapusdagi');
-  const stafLain = daftarStaf.filter((s) => s.peran !== 'Kapusdagi');
+  // Deteksi Kapusdagi lewat kolom khusus "kapusdagi" (isi "Ya"/"TRUE"/dst di satu baris)
+  // — TERPISAH dari kolom "peran" (yang dipakai bebas untuk nama divisi/jabatan kerja
+  // tiap staf, bukan penanda solo/berpasangan).
+  const kapusdagi = daftarStaf.find((s) => /^(ya|true|1|yes)$/i.test(String(s.kapusdagi || '').trim()));
+  const stafLain = daftarStaf.filter((s) => s !== kapusdagi);
   const slides = [];
   if (kapusdagi) slides.push([kapusdagi]);
   for (let i = 0; i < stafLain.length; i += 2) {
