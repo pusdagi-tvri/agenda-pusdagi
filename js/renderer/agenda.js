@@ -52,22 +52,23 @@ function buatSlideStaf(daftarStaf) {
 
 /** Satu kartu profil (foto + nama + jabatan) — pakai avatar inisial kalau kolom foto kosong. */
 function kartuStaf(staf, besar) {
-  const ukuranFoto = besar ? 'w-36 h-36' : 'w-28 h-28';
-  const lebarKartu = besar ? 'max-w-[420px]' : 'max-w-[340px]';
+  const tinggiKartu = besar ? 'h-[360px]' : 'h-[300px]';
+  const lebarFoto = besar ? 'w-[220px]' : 'w-[180px]';
+  const lebarKartu = besar ? 'max-w-[520px]' : 'max-w-[420px]';
 
   const fotoHTML = staf.foto
-    ? `<img src="assets/staf/${escapeHTML(staf.foto)}" alt="${escapeHTML(staf.nama)}" class="${ukuranFoto} rounded-full object-cover border-4 shrink-0" style="border-color:#2563EB;" />`
-    : `<div class="${ukuranFoto} rounded-full flex items-center justify-center text-3xl font-bold text-white border-4 shrink-0" style="background:#2563EB; border-color:#2563EB;">${escapeHTML((staf.nama || '?').charAt(0).toUpperCase())}</div>`;
+    ? `<img src="assets/staf/${escapeHTML(staf.foto)}" alt="${escapeHTML(staf.nama)}" class="${lebarFoto} h-full object-cover shrink-0" />`
+    : `<div class="${lebarFoto} h-full flex items-center justify-center text-5xl font-bold text-white shrink-0" style="background:#2563EB;">${escapeHTML((staf.nama || '?').charAt(0).toUpperCase())}</div>`;
 
   const kontakHTML = (staf.email || staf.hp) ? `
-    <div class="flex flex-col gap-1.5 mt-3 pt-3 w-full" style="border-top:1px solid rgba(255,255,255,0.08);">
+    <div class="flex flex-col gap-1.5 mt-3">
       ${staf.email ? `
-        <div class="flex items-center justify-center gap-2 text-[13px] text-[#94A3B8]">
+        <div class="flex items-center gap-2 text-[13px] text-[#94A3B8]">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" class="shrink-0"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
           <span>${escapeHTML(staf.email)}</span>
         </div>` : ''}
       ${staf.hp ? `
-        <div class="flex items-center justify-center gap-2 text-[13px] text-[#94A3B8]">
+        <div class="flex items-center gap-2 text-[13px] text-[#94A3B8]">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" class="shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
           <span>${escapeHTML(staf.hp)}</span>
         </div>` : ''}
@@ -75,16 +76,19 @@ function kartuStaf(staf, besar) {
   ` : '';
 
   const motoHTML = staf.moto ? `
-    <p class="text-[12px] italic text-center mt-3 leading-snug" style="color:#A78BFA;">&ldquo;${escapeHTML(staf.moto)}&rdquo;</p>
+    <p class="text-[13px] italic mt-3 pt-3 leading-snug" style="color:#A78BFA; border-top:1px solid rgba(255,255,255,0.08);">&ldquo;${escapeHTML(staf.moto)}&rdquo;</p>
   ` : '';
 
   return `
-    <div class="flex flex-col items-center text-center rounded-2xl p-6 ${lebarKartu} w-full" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);">
+    <div class="flex ${tinggiKartu} ${lebarKartu} w-full rounded-xl overflow-hidden" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);">
       ${fotoHTML}
-      <p class="text-[19px] font-semibold text-[#F8FAFC] mt-3">${escapeHTML(staf.nama)}</p>
-      <p class="text-[13px] text-[#94A3B8] mt-0.5">${escapeHTML(staf.jabatan || '')}</p>
-      ${kontakHTML}
-      ${motoHTML}
+      <div class="flex-1 min-w-0 flex flex-col justify-center p-6">
+        <div class="w-10 h-[3px] rounded-full mb-3" style="background:#2563EB;"></div>
+        <p class="text-[22px] font-bold text-[#F8FAFC] leading-tight">${escapeHTML(staf.nama)}</p>
+        <p class="text-[14px] font-medium mt-1" style="color:#60A5FA;">${escapeHTML(staf.jabatan || '')}</p>
+        ${kontakHTML}
+        ${motoHTML}
+      </div>
     </div>
   `;
 }
