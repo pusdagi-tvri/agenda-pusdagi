@@ -140,6 +140,8 @@ function renderKarouselStaf(content, daftarStaf) {
   if (karoselStafIntervalId) return;
 
   content.style.transition = 'opacity 0.35s ease';
+  const judul = document.getElementById('judul-agenda-hari-ini');
+  if (judul) judul.textContent = 'Squad Pusdagi';
   karoselStafIndeks = 0;
   tampilkanSlideStaf(content, slides, karoselStafIndeks);
   content.dataset.signature = 'karosel-staf';
@@ -155,6 +157,8 @@ function hentikanKarouselStaf(content) {
   if (karoselStafIntervalId) {
     clearInterval(karoselStafIntervalId);
     karoselStafIntervalId = null;
+    const judul = document.getElementById('judul-agenda-hari-ini');
+    if (judul) judul.textContent = 'Agenda Hari Ini';
   }
   // Bersihkan inline style — kalau tadi berhenti persis di tengah fase memudar-keluar,
   // opacity bisa nyangkut di 0 dan timeline agenda ikut jadi tak kelihatan.
