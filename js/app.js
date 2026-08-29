@@ -23,6 +23,7 @@ import { clamp } from './utils.js';
 const state = {
   daftarAgendaTerakhir: [],
   agendaMendatang: [], // hari ini + ke depan — khusus untuk card "Agenda Berikutnya" agar bisa lintas hari
+  daftarStaf: [], // profil staf Pusdagi — ditampilkan di Agenda Hari Ini saat kosong
   sudahAdaData: false, // beda dari "daftarAgendaTerakhir.length" — true begitu fetch/cache PERNAH berhasil, walau hasilnya 0 agenda
   detikSejakRefresh: 0,
   sedangOffline: false,
@@ -57,7 +58,7 @@ function tickCepat() {
  *  dan agenda mendatang sama-sama rebuild seluruh DOM-nya, jadi tidak perlu tiap detik. */
 function renderStrukturLambat() {
   const now = new Date();
-  Renderer.renderAgendaHariIni(state.daftarAgendaTerakhir, now);
+  Renderer.renderAgendaHariIni(state.daftarAgendaTerakhir, now, state.daftarStaf);
   Renderer.renderAgendaMendatang(state.agendaMendatang, now);
 }
 
@@ -84,6 +85,7 @@ async function muatDataDariServer() {
 
     state.daftarAgendaTerakhir = daftarAgenda;
     state.agendaMendatang = agendaMendatang;
+    state.daftarStaf = data.daftar_staf || [];
     state.sudahAdaData = true;
     state.detikSejakRefresh = 0;
     state.gagalBerturutTurut = 0;
