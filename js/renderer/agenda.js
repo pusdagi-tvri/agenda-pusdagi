@@ -34,6 +34,105 @@ const WARNA_STATUS_HEX = {
   [STATUS_OTOMATIS.BATAL]: '#EF4444'
 };
 
+let karoselStafIntervalId = null;
+let karoselStafIndeks = 0;
+
+/** Memecah daftar staf jadi slide: Kapusdagi sendiri (1 slide), sisanya berpasangan 2-2. */
+function buatSlideStaf(daftarStaf) {
+  if (!daftarStaf || !daftarStaf.length) return [];
+  const kapusdagi = daftarStaf.find((s) => s.peran === 'Kapusdagi');
+  const stafLain = daftarStaf.filter((s) => s.peran !== 'Kapusdagi');
+  const slides = [];
+  if (kapusdagi) slides.push([kapusdagi]);
+  for (let i = 0; i < stafLain.length; i += 2) {
+    slides.push(stafLain.slice(i, i + 2));
+  }
+  return slides;
+}
+
+/** Satu kartu profil (foto + nama + jabatan) — pakai avatar inisial kalau kolom foto kosong. */
+function kartuStaf(staf, besar) {
+  const ukuranFoto = besar ? 'w-36 h-36' : 'w-28 h-28';
+  const lebarKartu = besar ? 'max-w-[420px]' : 'max-w-[340px]';
+
+  const fotoHTML = staf.foto
+    ? `<img src="assets/staf/${escapeHTML(staf.foto)}" alt="${escapeHTML(staf.nama)}" class="${ukuranFoto} rounded-full object-cover border-4 shrink-0" style="border-color:#2563EB;" />`
+    : `<div class="${ukuranFoto} rounded-full flex items-center justify-center text-3xl font-bold text-white border-4 shrink-0" style="background:#2563EB; border-color:#2563EB;">${escapeHTML((staf.nama || '?').charAt(0).toUpperCase())}</div>`;
+
+  const kontakHTML = (staf.email || staf.hp) ? `
+    <div class="flex flex-col gap-1.5 mt-3 pt-3 w-full" style="border-top:1px solid rgba(255,255,255,0.08);">
+      ${staf.email ? `
+        <div class="flex items-center justify-center gap-2 text-[13px] text-[#94A3B8]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" class="shrink-0"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+          <span>${escapeHTML(staf.email)}</span>
+        </div>` : ''}
+      ${staf.hp ? `
+        <div class="flex items-center justify-center gap-2 text-[13px] text-[#94A3B8]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2" class="shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+          <span>${escapeHTML(staf.hp)}</span>
+        </div>` : ''}
+    </div>
+  ` : '';
+
+  const motoHTML = staf.moto ? `
+    <p class="text-[12px] italic text-center mt-3 leading-snug" style="color:#A78BFA;">&ldquo;${escapeHTML(staf.moto)}&rdquo;</p>
+  ` : '';
+
+  return `
+    <div class="flex flex-col items-center text-center rounded-2xl p-6 ${lebarKartu} w-full" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);">
+      ${fotoHTML}
+      <p class="text-[19px] font-semibold text-[#F8FAFC] mt-3">${escapeHTML(staf.nama)}</p>
+      <p class="text-[13px] text-[#94A3B8] mt-0.5">${escapeHTML(staf.jabatan || '')}</p>
+      ${kontakHTML}
+      ${motoHTML}
+    </div>
+  `;
+}
+
+function tampilkanSlideStaf(content, slides, indeks) {
+  const slide = slides[indeks];
+  if (!slide) return;
+  content.innerHTML = `
+    <div class="flex items-center justify-center h-full gap-10 fade-in">
+      ${slide.map((s) => kartuStaf(s, slide.length === 1)).join('')}
+    </div>
+  `;
+}
+
+/** Menjalankan karosel profil staf (berputar tiap 10 detik) — dipanggil saat Agenda Hari Ini kosong. */
+function renderKarouselStaf(content, daftarStaf) {
+  const slides = buatSlideStaf(daftarStaf);
+  if (!slides.length) {
+    if (content.dataset.signature !== '') {
+      content.innerHTML = `<p class="text-body-elegant flex items-center h-full">Tidak ada agenda yang terjadwal hari ini.</p>`;
+      content.dataset.signature = '';
+    }
+    return;
+  }
+
+  // Kalau karosel sudah berjalan, biarkan jalan terus — jangan di-restart tiap kali
+  // fungsi ini dipanggil ulang (siklus refresh data tiap 15 detik), supaya tidak
+  // "lompat" balik ke slide pertama terus-menerus.
+  if (karoselStafIntervalId) return;
+
+  karoselStafIndeks = 0;
+  tampilkanSlideStaf(content, slides, karoselStafIndeks);
+  content.dataset.signature = 'karosel-staf';
+
+  karoselStafIntervalId = setInterval(() => {
+    karoselStafIndeks = (karoselStafIndeks + 1) % slides.length;
+    tampilkanSlideStaf(content, slides, karoselStafIndeks);
+  }, 10000);
+}
+
+/** Menghentikan karosel staf — dipanggil begitu Agenda Hari Ini terisi lagi. */
+function hentikanKarouselStaf() {
+  if (karoselStafIntervalId) {
+    clearInterval(karoselStafIntervalId);
+    karoselStafIntervalId = null;
+  }
+}
+
 export const AgendaRenderer = {
 
   /**
@@ -42,7 +141,7 @@ export const AgendaRenderer = {
    * yang sedang berlangsung disorot (border + latar tint), sesuai referensi
    * desain yang diberikan.
    */
-  renderAgendaHariIni(daftarAgenda, now) {
+  renderAgendaHariIni(daftarAgenda, now, daftarStaf) {
     const skeleton = $('agenda-hari-ini-skeleton');
     const content = $('agenda-hari-ini-content');
     const tanggalLabel = $('tanggal-timeline');
@@ -56,12 +155,11 @@ export const AgendaRenderer = {
     if (tanggalLabel) tanggalLabel.textContent = formatTanggalIndonesia(now);
 
     if (!aktif.length) {
-      if (content.dataset.signature !== '') {
-        content.innerHTML = `<p class="text-body-elegant flex items-center h-full">Tidak ada agenda yang terjadwal hari ini.</p>`;
-        content.dataset.signature = '';
-      }
+      renderKarouselStaf(content, daftarStaf);
       return;
     }
+
+    hentikanKarouselStaf(); // Agenda Hari Ini terisi lagi — hentikan karosel profil staf kalau tadi berjalan
 
     // Status tiap baris bisa berubah murni karena waktu berjalan (Belum Dimulai → Berlangsung
     // → Selesai) tanpa data baru — jadi signature ikut menyertakan status per baris, bukan cuma ID.
@@ -116,7 +214,7 @@ export const AgendaRenderer = {
       tombol.addEventListener('click', () => {
         content.dataset.expanded = expanded ? '0' : '1';
         content.dataset.signature = ''; // paksa render ulang meski status agenda tidak berubah
-        this.renderAgendaHariIni(daftarAgenda, now);
+        this.renderAgendaHariIni(daftarAgenda, now, daftarStaf);
       });
     }
   },
