@@ -99,11 +99,28 @@ function kartuStaf(staf, besar) {
 function tampilkanSlideStaf(content, slides, indeks) {
   const slide = slides[indeks];
   if (!slide) return;
-  content.innerHTML = `
-    <div class="flex items-center justify-center h-full gap-10 fade-in">
-      ${slide.map((s) => kartuStaf(s, slide.length === 1)).join('')}
-    </div>
-  `;
+
+  const gantiIsi = () => {
+    content.innerHTML = `
+      <div class="flex items-center justify-center h-full gap-10">
+        ${slide.map((s) => kartuStaf(s, slide.length === 1)).join('')}
+      </div>
+    `;
+    // Baris berikutnya sengaja dipisah dari innerHTML di atas — browser butuh "napas"
+    // satu frame supaya transisi opacity 0→1 benar-benar teranimasi (kalau digabung
+    // jadi satu langkah, browser sering melompatinya, transisinya jadi tidak terlihat).
+    requestAnimationFrame(() => { content.style.opacity = '1'; });
+  };
+
+  if (!content.innerHTML.trim()) {
+    // Render pertama kali (belum ada slide sebelumnya) — langsung tampil, tidak perlu
+    // memudar-keluar dulu karena tidak ada apa pun yang perlu "dihilangkan".
+    gantiIsi();
+    return;
+  }
+
+  content.style.opacity = '0';
+  setTimeout(gantiIsi, 350); // tunggu transisi memudar-keluar (350ms) baru ganti isinya
 }
 
 /** Menjalankan karosel profil staf (berputar tiap 10 detik) — dipanggil saat Agenda Hari Ini kosong. */
@@ -122,6 +139,7 @@ function renderKarouselStaf(content, daftarStaf) {
   // "lompat" balik ke slide pertama terus-menerus.
   if (karoselStafIntervalId) return;
 
+  content.style.transition = 'opacity 0.35s ease';
   karoselStafIndeks = 0;
   tampilkanSlideStaf(content, slides, karoselStafIndeks);
   content.dataset.signature = 'karosel-staf';
@@ -133,10 +151,16 @@ function renderKarouselStaf(content, daftarStaf) {
 }
 
 /** Menghentikan karosel staf — dipanggil begitu Agenda Hari Ini terisi lagi. */
-function hentikanKarouselStaf() {
+function hentikanKarouselStaf(content) {
   if (karoselStafIntervalId) {
     clearInterval(karoselStafIntervalId);
     karoselStafIntervalId = null;
+  }
+  // Bersihkan inline style — kalau tadi berhenti persis di tengah fase memudar-keluar,
+  // opacity bisa nyangkut di 0 dan timeline agenda ikut jadi tak kelihatan.
+  if (content) {
+    content.style.opacity = '';
+    content.style.transition = '';
   }
 }
 
@@ -166,7 +190,7 @@ export const AgendaRenderer = {
       return;
     }
 
-    hentikanKarouselStaf(); // Agenda Hari Ini terisi lagi — hentikan karosel profil staf kalau tadi berjalan
+    hentikanKarouselStaf(content); // Agenda Hari Ini terisi lagi — hentikan karosel profil staf kalau tadi berjalan
 
     // Status tiap baris bisa berubah murni karena waktu berjalan (Belum Dimulai → Berlangsung
     // → Selesai) tanpa data baru — jadi signature ikut menyertakan status per baris, bukan cuma ID.
