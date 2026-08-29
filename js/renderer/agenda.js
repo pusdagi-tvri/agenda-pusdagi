@@ -100,27 +100,43 @@ function tampilkanSlideStaf(content, slides, indeks) {
   const slide = slides[indeks];
   if (!slide) return;
 
-  const gantiIsi = () => {
-    content.innerHTML = `
-      <div class="flex items-center justify-center h-full gap-10">
-        ${slide.map((s) => kartuStaf(s, slide.length === 1)).join('')}
-      </div>
-    `;
-    // Baris berikutnya sengaja dipisah dari innerHTML di atas — browser butuh "napas"
-    // satu frame supaya transisi opacity 0→1 benar-benar teranimasi (kalau digabung
-    // jadi satu langkah, browser sering melompatinya, transisinya jadi tidak terlihat).
-    requestAnimationFrame(() => { content.style.opacity = '1'; });
-  };
+  const htmlSlide = `
+    <div class="flex items-center justify-center h-full gap-10">
+      ${slide.map((s) => kartuStaf(s, slide.length === 1)).join('')}
+    </div>
+  `;
 
-  if (!content.innerHTML.trim()) {
-    // Render pertama kali (belum ada slide sebelumnya) — langsung tampil, tidak perlu
-    // memudar-keluar dulu karena tidak ada apa pun yang perlu "dihilangkan".
-    gantiIsi();
+  const lapisanDepan = content.querySelector('[data-lapisan="depan"]');
+  const lapisanBelakang = content.querySelector('[data-lapisan="belakang"]');
+
+  if (!lapisanDepan || !lapisanBelakang) {
+    // Render pertama kali — belum ada lapisan sama sekali, siapkan strukturnya dulu.
+    // Dua <div> ditumpuk persis di posisi yang sama (position:absolute, inset:0);
+    // yang "depan" langsung terlihat (opacity:1), yang "belakang" tersembunyi (opacity:0),
+    // siap dipakai gantian di siklus berikutnya.
+    content.style.position = 'relative';
+    content.innerHTML = `
+      <div data-lapisan="depan" style="position:absolute; inset:0; opacity:1; transition:opacity 0.7s ease;">${htmlSlide}</div>
+      <div data-lapisan="belakang" style="position:absolute; inset:0; opacity:0; transition:opacity 0.7s ease;"></div>
+    `;
     return;
   }
 
-  content.style.opacity = '0';
-  setTimeout(gantiIsi, 350); // tunggu transisi memudar-keluar (350ms) baru ganti isinya
+  // Dissolve sungguhan: isi lapisan belakang (tersembunyi) dengan slide baru, lalu
+  // KEDUA lapisan memudar BERSAMAAN — yang lama 1→0, yang baru 0→1 — sehingga sesaat
+  // dua-duanya tumpang tindih/berbaur, bukan sekadar menghilang-lalu-muncul berurutan.
+  lapisanBelakang.innerHTML = htmlSlide;
+  requestAnimationFrame(() => {
+    lapisanDepan.style.opacity = '0';
+    lapisanBelakang.style.opacity = '1';
+  });
+
+  // Setelah transisi selesai, tukar label "depan"/"belakang" supaya siklus berikutnya
+  // benar (yang baru saja jadi terlihat sekarang berperan sebagai "depan").
+  setTimeout(() => {
+    lapisanDepan.setAttribute('data-lapisan', 'belakang');
+    lapisanBelakang.setAttribute('data-lapisan', 'depan');
+  }, 700);
 }
 
 /** Menjalankan karosel profil staf (berputar tiap 10 detik) — dipanggil saat Agenda Hari Ini kosong. */
@@ -139,7 +155,6 @@ function renderKarouselStaf(content, daftarStaf) {
   // "lompat" balik ke slide pertama terus-menerus.
   if (karoselStafIntervalId) return;
 
-  content.style.transition = 'opacity 0.35s ease';
   const judul = document.getElementById('judul-agenda-hari-ini');
   if (judul) judul.textContent = 'Squad Pusdagi';
   karoselStafIndeks = 0;
@@ -160,11 +175,10 @@ function hentikanKarouselStaf(content) {
     const judul = document.getElementById('judul-agenda-hari-ini');
     if (judul) judul.textContent = 'Agenda Hari Ini';
   }
-  // Bersihkan inline style — kalau tadi berhenti persis di tengah fase memudar-keluar,
-  // opacity bisa nyangkut di 0 dan timeline agenda ikut jadi tak kelihatan.
+  // Bersihkan inline style — struktur 2-lapisan (position:relative, dst) khusus dipakai
+  // karosel staf, tidak relevan lagi begitu timeline agenda biasa yang dirender.
   if (content) {
-    content.style.opacity = '';
-    content.style.transition = '';
+    content.style.position = '';
   }
 }
 
