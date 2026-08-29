@@ -88,6 +88,25 @@
   }
   .fade-in { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
 
+  /* Kartu profil "Squad Pusdagi" — ukuran desktop/kiosk (default). Ditumpuk vertikal
+     dan diperkecil khusus di layar sempit lewat aturan mode HP di bawah. */
+  .kartu-staf { display: flex; height: 300px; max-width: 420px; }
+  .kartu-staf--besar { height: 360px; max-width: 520px; }
+  .kartu-staf-foto { width: 180px; height: 100%; }
+  .kartu-staf--besar .kartu-staf-foto { width: 220px; }
+
+  /* Mode HP/tablet sempit — kartu ditumpuk vertikal (foto di atas, bukan di samping),
+     lebar & tinggi jadi otomatis mengikuti konten, bukan piksel tetap ala kiosk. */
+  @media (max-width: 768px) {
+    .slide-staf { flex-direction: column; gap: 20px !important; }
+    .kartu-staf, .kartu-staf--besar {
+      flex-direction: column; height: auto; max-width: 100%;
+    }
+    .kartu-staf-foto, .kartu-staf--besar .kartu-staf-foto {
+      width: 100%; height: 140px;
+    }
+  }
+
   #loading-screen {
     position: fixed; inset: 0; background: var(--color-bg); z-index: 999;
     display: flex; align-items: center; justify-content: center; transition: opacity 0.6s ease;
