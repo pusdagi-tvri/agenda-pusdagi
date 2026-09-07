@@ -115,16 +115,15 @@ export const AdminApiService = {
     return kirimForm({ action: 'updateSetting', key: 'kecepatan_running_teks', value: String(nilai) });
   },
 
-  /** Keduanya lewat GET biasa (bukan kirimForm) — kita PERLU baca hasilnya (base64 file),
-   *  beda dari operasi tulis lain di Admin Panel yang cukup "kirim lalu lupakan". */
-  /** Timeout dinaikkan jadi 90 detik (bukan 20 detik default) — generate PDF/Excel
-   *  di server (bikin dokumen/sheet sementara, ekspor, encode base64) makan waktu
-   *  lebih lama dari operasi biasa, apalagi kalau datanya banyak. */
-  ambilRekapPDF(dari, sampai) {
-    return permintaan(`/rekap/pdf?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}`, { timeoutMs: 90000 });
+  /** Cuma membangun URL-nya saja (BUKAN fetch()) — dipakai lewat navigasi langsung
+   *  (src <iframe> atau window.open) di adminApp.js. fetch() ke endpoint ini
+   *  terbukti selalu diblokir CORS oleh Google apa pun ukuran responsnya; navigasi
+   *  langsung sama sekali tidak tunduk aturan CORS. */
+  urlRekapPDF(dari, sampai) {
+    return `${CONFIG.API_BASE_URL}/rekap/pdf?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}&key=${encodeURIComponent(AdminAuth.ambilToken())}`;
   },
 
-  ambilRekapExcel(dari, sampai) {
-    return permintaan(`/rekap/excel?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}`, { timeoutMs: 90000 });
+  urlRekapExcel(dari, sampai) {
+    return `${CONFIG.API_BASE_URL}/rekap/excel?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}&key=${encodeURIComponent(AdminAuth.ambilToken())}`;
   }
 };
