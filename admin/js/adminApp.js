@@ -142,28 +142,7 @@ function inisialisasiToggleTemaAdmin() {
 }
 
 /** Menyimpan pengaturan kecepatan running teks (1-10) ke sheet Pengaturan. */
-let urlPreviewRekapAktif = null; // dilepas (revokeObjectURL) begitu diganti/modal ditutup, hindari kebocoran memori
-let namaFilePdfAktif = '';
-
-/** Mengubah string base64 (dari respons backend) jadi Blob siap dipakai <iframe>/download. */
-function base64KeBlob(base64, mimeType) {
-  const byteChars = atob(base64);
-  const byteNumbers = new Array(byteChars.length);
-  for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
-  return new Blob([new Uint8Array(byteNumbers)], { type: mimeType });
-}
-
-/** Memicu unduhan file dari sebuah Blob lewat elemen <a> sementara. */
-function unduhBlob(blob, namaFile) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = namaFile;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
+let urlUnduhPdfAktif = '';
 
 /** Membaca & memvalidasi rentang tanggal dari form filter Rekap. Null kalau tidak valid. */
 function bacaFilterTanggalRekap(pesanEl) {
@@ -190,14 +169,12 @@ async function previewRekapPDF() {
   pesan.textContent = 'Membuat PDF… (bisa memakan waktu sampai 1 menit)';
   pesan.style.color = '#6B7280';
   try {
+    // Backend mengembalikan LINK Google Drive (bukan isi file/base64) — file base64
+    // berukuran besar terbukti diblokir CORS oleh Google, link kecil aman dikirim.
     const hasil = await AdminApiService.ambilRekapPDF(rentang.dari, rentang.sampai);
-    const blob = base64KeBlob(hasil.base64, hasil.mime_type);
+    urlUnduhPdfAktif = hasil.url_unduh;
 
-    if (urlPreviewRekapAktif) URL.revokeObjectURL(urlPreviewRekapAktif);
-    urlPreviewRekapAktif = URL.createObjectURL(blob);
-    namaFilePdfAktif = hasil.nama_file;
-
-    document.getElementById('iframe-preview-rekap').src = urlPreviewRekapAktif;
+    document.getElementById('iframe-preview-rekap').src = hasil.url_preview;
     document.getElementById('modal-rekap').classList.remove('hidden');
     document.getElementById('modal-rekap').classList.add('flex');
     pesan.textContent = '';
@@ -222,8 +199,8 @@ async function unduhRekapExcel() {
   pesan.style.color = '#6B7280';
   try {
     const hasil = await AdminApiService.ambilRekapExcel(rentang.dari, rentang.sampai);
-    unduhBlob(base64KeBlob(hasil.base64, hasil.mime_type), hasil.nama_file);
-    pesan.textContent = 'Excel berhasil diunduh.';
+    window.open(hasil.url_unduh, '_blank');
+    pesan.textContent = 'Excel siap diunduh (tab baru terbuka).';
     pesan.style.color = '#059669';
   } catch (err) {
     pesan.textContent = 'Gagal membuat Excel: ' + err.message;
@@ -268,9 +245,7 @@ function init() {
   document.getElementById('tombol-unduh-excel').addEventListener('click', unduhRekapExcel);
   document.getElementById('tombol-tutup-modal-rekap').addEventListener('click', tutupModalRekap);
   document.getElementById('tombol-unduh-pdf-dari-modal').addEventListener('click', () => {
-    if (urlPreviewRekapAktif) {
-      fetch(urlPreviewRekapAktif).then((r) => r.blob()).then((blob) => unduhBlob(blob, namaFilePdfAktif));
-    }
+    if (urlUnduhPdfAktif) window.open(urlUnduhPdfAktif, '_blank');
   });
 
   if (AdminAuth.sudahLogin()) {
