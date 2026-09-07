@@ -119,8 +119,9 @@ export const AdminApiService = {
    *  (src <iframe> atau window.open) di adminApp.js. fetch() ke endpoint ini
    *  terbukti selalu diblokir CORS oleh Google apa pun ukuran responsnya; navigasi
    *  langsung sama sekali tidak tunduk aturan CORS. */
-  urlRekapPDF(dari, sampai) {
-    return `${CONFIG.API_BASE_URL}/rekap/pdf?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}&key=${encodeURIComponent(AdminAuth.ambilToken())}`;
+  urlRekapPDF(dari, sampai, mode) {
+    const modeParam = mode ? `&mode=${encodeURIComponent(mode)}` : '';
+    return `${CONFIG.API_BASE_URL}/rekap/pdf?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}${modeParam}&key=${encodeURIComponent(AdminAuth.ambilToken())}`;
   },
 
   urlRekapExcel(dari, sampai) {

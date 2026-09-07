@@ -142,6 +142,8 @@ function inisialisasiToggleTemaAdmin() {
 }
 
 /** Menyimpan pengaturan kecepatan running teks (1-10) ke sheet Pengaturan. */
+let rentangRekapTerakhir = null; // { dari, sampai } dari preview PDF terakhir — dipakai tombol Unduh PDF di modal
+
 /** Membaca & memvalidasi rentang tanggal dari form filter Rekap. Null kalau tidak valid. */
 function bacaFilterTanggalRekap(pesanEl) {
   const dari = document.getElementById('rekap-dari').value;
@@ -163,6 +165,8 @@ async function previewRekapPDF() {
   const pesan = document.getElementById('pesan-rekap');
   const rentang = bacaFilterTanggalRekap(pesan);
   if (!rentang) return;
+
+  rentangRekapTerakhir = rentang; // dipakai tombol "Unduh PDF" di dalam modal
 
   pesan.textContent = 'Membuat PDF… (bisa memakan waktu sampai 1 menit)';
   pesan.style.color = '#6B7280';
@@ -230,11 +234,14 @@ function init() {
   document.getElementById('tombol-unduh-excel').addEventListener('click', unduhRekapExcel);
   document.getElementById('tombol-tutup-modal-rekap').addEventListener('click', tutupModalRekap);
   document.getElementById('tombol-unduh-pdf-dari-modal').addEventListener('click', () => {
-    // Buka src iframe yang SUDAH termuat (sudah teralihkan ke halaman preview Drive
-    // untuk file yang sama) di tab baru — supaya tidak generate ulang file duplikat.
-    // Halaman preview Drive itu sendiri sudah punya tombol unduh bawaan di pojoknya.
-    const iframe = document.getElementById('iframe-preview-rekap');
-    if (iframe.src && iframe.src !== 'about:blank') window.open(iframe.src, '_blank');
+    // Bikin permintaan BARU khusus mode unduh (link Drive versi unduh, bukan preview
+    // yang sengaja tanpa tombol unduh) — tidak bisa reuse file dari preview karena
+    // src iframe yang sudah dialihkan ke domain Drive tidak bisa dibaca balik oleh JS
+    // (dibatasi keamanan cross-origin browser). Konsekuensinya: 1 file PDF duplikat
+    // baru tercipta tiap klik tombol ini, tapi ini yang paling sederhana & pasti aman.
+    if (rentangRekapTerakhir) {
+      window.open(AdminApiService.urlRekapPDF(rentangRekapTerakhir.dari, rentangRekapTerakhir.sampai, 'unduh'), '_blank');
+    }
   });
 
   if (AdminAuth.sudahLogin()) {
