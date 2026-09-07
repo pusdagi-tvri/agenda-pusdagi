@@ -187,7 +187,7 @@ async function previewRekapPDF() {
   const rentang = bacaFilterTanggalRekap(pesan);
   if (!rentang) return;
 
-  pesan.textContent = 'Membuat PDF…';
+  pesan.textContent = 'Membuat PDF… (bisa memakan waktu sampai 1 menit)';
   pesan.style.color = '#6B7280';
   try {
     const hasil = await AdminApiService.ambilRekapPDF(rentang.dari, rentang.sampai);
@@ -218,7 +218,7 @@ async function unduhRekapExcel() {
   const rentang = bacaFilterTanggalRekap(pesan);
   if (!rentang) return;
 
-  pesan.textContent = 'Membuat Excel…';
+  pesan.textContent = 'Membuat Excel… (bisa memakan waktu sampai 1 menit)';
   pesan.style.color = '#6B7280';
   try {
     const hasil = await AdminApiService.ambilRekapExcel(rentang.dari, rentang.sampai);

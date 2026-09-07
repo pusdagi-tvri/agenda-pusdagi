@@ -53,7 +53,7 @@ async function permintaan(path, opsi) {
   const url = `${CONFIG.API_BASE_URL}${path}${pemisah}key=${encodeURIComponent(AdminAuth.ambilToken())}`;
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), opsi.timeoutMs || CONFIG.REQUEST_TIMEOUT_MS);
 
   try {
     const response = await fetch(url, {
@@ -117,11 +117,14 @@ export const AdminApiService = {
 
   /** Keduanya lewat GET biasa (bukan kirimForm) — kita PERLU baca hasilnya (base64 file),
    *  beda dari operasi tulis lain di Admin Panel yang cukup "kirim lalu lupakan". */
+  /** Timeout dinaikkan jadi 90 detik (bukan 20 detik default) — generate PDF/Excel
+   *  di server (bikin dokumen/sheet sementara, ekspor, encode base64) makan waktu
+   *  lebih lama dari operasi biasa, apalagi kalau datanya banyak. */
   ambilRekapPDF(dari, sampai) {
-    return permintaan(`/rekap/pdf?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}`);
+    return permintaan(`/rekap/pdf?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}`, { timeoutMs: 90000 });
   },
 
   ambilRekapExcel(dari, sampai) {
-    return permintaan(`/rekap/excel?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}`);
+    return permintaan(`/rekap/excel?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}`, { timeoutMs: 90000 });
   }
 };
