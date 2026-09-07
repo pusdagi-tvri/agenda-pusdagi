@@ -113,5 +113,15 @@ export const AdminApiService = {
 
   simpanKecepatanTeks(nilai) {
     return kirimForm({ action: 'updateSetting', key: 'kecepatan_running_teks', value: String(nilai) });
+  },
+
+  /** Keduanya lewat GET biasa (bukan kirimForm) — kita PERLU baca hasilnya (base64 file),
+   *  beda dari operasi tulis lain di Admin Panel yang cukup "kirim lalu lupakan". */
+  ambilRekapPDF(dari, sampai) {
+    return permintaan(`/rekap/pdf?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}`);
+  },
+
+  ambilRekapExcel(dari, sampai) {
+    return permintaan(`/rekap/excel?dari=${encodeURIComponent(dari)}&sampai=${encodeURIComponent(sampai)}`);
   }
 };

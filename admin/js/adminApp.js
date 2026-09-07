@@ -142,6 +142,95 @@ function inisialisasiToggleTemaAdmin() {
 }
 
 /** Menyimpan pengaturan kecepatan running teks (1-10) ke sheet Pengaturan. */
+let urlPreviewRekapAktif = null; // dilepas (revokeObjectURL) begitu diganti/modal ditutup, hindari kebocoran memori
+let namaFilePdfAktif = '';
+
+/** Mengubah string base64 (dari respons backend) jadi Blob siap dipakai <iframe>/download. */
+function base64KeBlob(base64, mimeType) {
+  const byteChars = atob(base64);
+  const byteNumbers = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+  return new Blob([new Uint8Array(byteNumbers)], { type: mimeType });
+}
+
+/** Memicu unduhan file dari sebuah Blob lewat elemen <a> sementara. */
+function unduhBlob(blob, namaFile) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = namaFile;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** Membaca & memvalidasi rentang tanggal dari form filter Rekap. Null kalau tidak valid. */
+function bacaFilterTanggalRekap(pesanEl) {
+  const dari = document.getElementById('rekap-dari').value;
+  const sampai = document.getElementById('rekap-sampai').value;
+  if (!dari || !sampai) {
+    pesanEl.textContent = 'Isi kedua tanggal dulu.';
+    pesanEl.style.color = '#DC2626';
+    return null;
+  }
+  if (dari > sampai) {
+    pesanEl.textContent = '"Dari Tanggal" tidak boleh setelah "Sampai Tanggal".';
+    pesanEl.style.color = '#DC2626';
+    return null;
+  }
+  return { dari, sampai };
+}
+
+async function previewRekapPDF() {
+  const pesan = document.getElementById('pesan-rekap');
+  const rentang = bacaFilterTanggalRekap(pesan);
+  if (!rentang) return;
+
+  pesan.textContent = 'Membuat PDF…';
+  pesan.style.color = '#6B7280';
+  try {
+    const hasil = await AdminApiService.ambilRekapPDF(rentang.dari, rentang.sampai);
+    const blob = base64KeBlob(hasil.base64, hasil.mime_type);
+
+    if (urlPreviewRekapAktif) URL.revokeObjectURL(urlPreviewRekapAktif);
+    urlPreviewRekapAktif = URL.createObjectURL(blob);
+    namaFilePdfAktif = hasil.nama_file;
+
+    document.getElementById('iframe-preview-rekap').src = urlPreviewRekapAktif;
+    document.getElementById('modal-rekap').classList.remove('hidden');
+    document.getElementById('modal-rekap').classList.add('flex');
+    pesan.textContent = '';
+  } catch (err) {
+    pesan.textContent = 'Gagal membuat PDF: ' + err.message;
+    pesan.style.color = '#DC2626';
+  }
+}
+
+function tutupModalRekap() {
+  document.getElementById('modal-rekap').classList.add('hidden');
+  document.getElementById('modal-rekap').classList.remove('flex');
+  document.getElementById('iframe-preview-rekap').src = 'about:blank';
+}
+
+async function unduhRekapExcel() {
+  const pesan = document.getElementById('pesan-rekap');
+  const rentang = bacaFilterTanggalRekap(pesan);
+  if (!rentang) return;
+
+  pesan.textContent = 'Membuat Excel…';
+  pesan.style.color = '#6B7280';
+  try {
+    const hasil = await AdminApiService.ambilRekapExcel(rentang.dari, rentang.sampai);
+    unduhBlob(base64KeBlob(hasil.base64, hasil.mime_type), hasil.nama_file);
+    pesan.textContent = 'Excel berhasil diunduh.';
+    pesan.style.color = '#059669';
+  } catch (err) {
+    pesan.textContent = 'Gagal membuat Excel: ' + err.message;
+    pesan.style.color = '#DC2626';
+  }
+}
+
 async function simpanKecepatanTeks() {
   const input = document.getElementById('form-kecepatan-teks');
   const pesan = document.getElementById('pesan-kecepatan');
@@ -175,6 +264,14 @@ function init() {
   document.getElementById('tombol-logout').addEventListener('click', tanganiLogout);
   document.getElementById('cari-arsip').addEventListener('input', terapkanPencarianArsip);
   document.getElementById('tombol-simpan-kecepatan').addEventListener('click', simpanKecepatanTeks);
+  document.getElementById('tombol-preview-rekap').addEventListener('click', previewRekapPDF);
+  document.getElementById('tombol-unduh-excel').addEventListener('click', unduhRekapExcel);
+  document.getElementById('tombol-tutup-modal-rekap').addEventListener('click', tutupModalRekap);
+  document.getElementById('tombol-unduh-pdf-dari-modal').addEventListener('click', () => {
+    if (urlPreviewRekapAktif) {
+      fetch(urlPreviewRekapAktif).then((r) => r.blob()).then((blob) => unduhBlob(blob, namaFilePdfAktif));
+    }
+  });
 
   if (AdminAuth.sudahLogin()) {
     bukaPanel();
