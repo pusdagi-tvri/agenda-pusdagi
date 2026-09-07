@@ -142,7 +142,15 @@ function inisialisasiToggleTemaAdmin() {
 }
 
 /** Menyimpan pengaturan kecepatan running teks (1-10) ke sheet Pengaturan. */
-let rentangRekapTerakhir = null; // { dari, sampai } dari preview PDF terakhir — dipakai tombol Unduh PDF di modal
+function unduhRekapPDF() {
+  const pesan = document.getElementById('pesan-rekap');
+  const rentang = bacaFilterTanggalRekap(pesan);
+  if (!rentang) return;
+
+  pesan.textContent = 'Membuat PDF… tab baru akan terbuka begitu selesai (bisa sampai 1 menit).';
+  pesan.style.color = '#6B7280';
+  window.open(AdminApiService.urlRekapPDF(rentang.dari, rentang.sampai, 'unduh'), '_blank');
+}
 
 /** Membaca & memvalidasi rentang tanggal dari form filter Rekap. Null kalau tidak valid. */
 function bacaFilterTanggalRekap(pesanEl) {
@@ -161,30 +169,17 @@ function bacaFilterTanggalRekap(pesanEl) {
   return { dari, sampai };
 }
 
-async function previewRekapPDF() {
+function previewRekapPDF() {
   const pesan = document.getElementById('pesan-rekap');
   const rentang = bacaFilterTanggalRekap(pesan);
   if (!rentang) return;
 
-  rentangRekapTerakhir = rentang; // dipakai tombol "Unduh PDF" di dalam modal
-
-  pesan.textContent = 'Membuat PDF… (bisa memakan waktu sampai 1 menit)';
+  // Dibuka di TAB BARU (bukan iframe di dalam modal) — Google kemungkinan memblokir
+  // halaman ini ditampilkan di dalam iframe (kebijakan X-Frame-Options), yang selama
+  // ini jadi penyebab preview selalu gagal walau link-nya sendiri valid.
+  pesan.textContent = 'Membuat PDF… tab baru akan terbuka begitu selesai (bisa sampai 1 menit).';
   pesan.style.color = '#6B7280';
-
-  // Navigasi langsung (src iframe) — BUKAN fetch(). Server memproses lalu
-  // mengalihkan iframe ke link Drive-nya begitu selesai; kita tidak perlu (dan
-  // tidak bisa) membaca responsnya langsung lewat JS, cukup biarkan iframe memuatnya.
-  const iframe = document.getElementById('iframe-preview-rekap');
-  iframe.src = AdminApiService.urlRekapPDF(rentang.dari, rentang.sampai);
-  document.getElementById('modal-rekap').classList.remove('hidden');
-  document.getElementById('modal-rekap').classList.add('flex');
-  pesan.textContent = '';
-}
-
-function tutupModalRekap() {
-  document.getElementById('modal-rekap').classList.add('hidden');
-  document.getElementById('modal-rekap').classList.remove('flex');
-  document.getElementById('iframe-preview-rekap').src = 'about:blank';
+  window.open(AdminApiService.urlRekapPDF(rentang.dari, rentang.sampai), '_blank');
 }
 
 function unduhRekapExcel() {
@@ -231,18 +226,8 @@ function init() {
   document.getElementById('cari-arsip').addEventListener('input', terapkanPencarianArsip);
   document.getElementById('tombol-simpan-kecepatan').addEventListener('click', simpanKecepatanTeks);
   document.getElementById('tombol-preview-rekap').addEventListener('click', previewRekapPDF);
+  document.getElementById('tombol-unduh-pdf').addEventListener('click', unduhRekapPDF);
   document.getElementById('tombol-unduh-excel').addEventListener('click', unduhRekapExcel);
-  document.getElementById('tombol-tutup-modal-rekap').addEventListener('click', tutupModalRekap);
-  document.getElementById('tombol-unduh-pdf-dari-modal').addEventListener('click', () => {
-    // Bikin permintaan BARU khusus mode unduh (link Drive versi unduh, bukan preview
-    // yang sengaja tanpa tombol unduh) — tidak bisa reuse file dari preview karena
-    // src iframe yang sudah dialihkan ke domain Drive tidak bisa dibaca balik oleh JS
-    // (dibatasi keamanan cross-origin browser). Konsekuensinya: 1 file PDF duplikat
-    // baru tercipta tiap klik tombol ini, tapi ini yang paling sederhana & pasti aman.
-    if (rentangRekapTerakhir) {
-      window.open(AdminApiService.urlRekapPDF(rentangRekapTerakhir.dari, rentangRekapTerakhir.sampai, 'unduh'), '_blank');
-    }
-  });
 
   if (AdminAuth.sudahLogin()) {
     bukaPanel();
