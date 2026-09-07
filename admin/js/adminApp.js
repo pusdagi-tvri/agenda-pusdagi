@@ -141,7 +141,7 @@ function inisialisasiToggleTemaAdmin() {
   });
 }
 
-/** Menyimpan pengaturan kecepatan running teks (1-10) ke sheet Pengaturan. */
+/** Membuat & mengunduh PDF rekap (tab baru, langsung unduh — tanpa preview). */
 function unduhRekapPDF() {
   const pesan = document.getElementById('pesan-rekap');
   const rentang = bacaFilterTanggalRekap(pesan);
@@ -167,19 +167,6 @@ function bacaFilterTanggalRekap(pesanEl) {
     return null;
   }
   return { dari, sampai };
-}
-
-function previewRekapPDF() {
-  const pesan = document.getElementById('pesan-rekap');
-  const rentang = bacaFilterTanggalRekap(pesan);
-  if (!rentang) return;
-
-  // Dibuka di TAB BARU (bukan iframe di dalam modal) — Google kemungkinan memblokir
-  // halaman ini ditampilkan di dalam iframe (kebijakan X-Frame-Options), yang selama
-  // ini jadi penyebab preview selalu gagal walau link-nya sendiri valid.
-  pesan.textContent = 'Membuat PDF… tab baru akan terbuka begitu selesai (bisa sampai 1 menit).';
-  pesan.style.color = '#6B7280';
-  window.open(AdminApiService.urlRekapPDF(rentang.dari, rentang.sampai), '_blank');
 }
 
 function unduhRekapExcel() {
@@ -225,7 +212,6 @@ function init() {
   document.getElementById('tombol-logout').addEventListener('click', tanganiLogout);
   document.getElementById('cari-arsip').addEventListener('input', terapkanPencarianArsip);
   document.getElementById('tombol-simpan-kecepatan').addEventListener('click', simpanKecepatanTeks);
-  document.getElementById('tombol-preview-rekap').addEventListener('click', previewRekapPDF);
   document.getElementById('tombol-unduh-pdf').addEventListener('click', unduhRekapPDF);
   document.getElementById('tombol-unduh-excel').addEventListener('click', unduhRekapExcel);
 
