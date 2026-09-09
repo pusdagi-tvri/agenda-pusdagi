@@ -18,6 +18,7 @@ import { ClockService } from './clockService.js';
 import { Renderer } from './renderer.js';
 import { aktifkanAutoScale } from './stageScaler.js';
 import { clamp } from './utils.js';
+import { aktifkanPembaruanCuaca } from './weatherService.js';
 
 /** State aplikasi — sengaja disimpan sesederhana mungkin (bukan store/reactive framework). */
 const state = {
@@ -231,6 +232,7 @@ function inisialisasiToggleTema() {
 /* ---------------------------------------------------------- 5. INISIALISASI APLIKASI */
 async function init() {
   aktifkanAutoScale();
+  aktifkanPembaruanCuaca();
   inisialisasiToggleTema();
   ClockService.mulai(() => {}); // jam sebenarnya sudah dirender lewat tickCepat(); modul ini dipakai bila ingin memisah lebih lanjut
 
