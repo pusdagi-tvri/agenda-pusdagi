@@ -171,94 +171,6 @@ function hentikanKarouselStaf(content) {
   }
 }
 
-/** Ikon SVG animasi per jenis cuaca — animasinya didefinisikan lewat class CSS
- *  (lihat index.html) supaya tidak perlu mengulang keyframes di tiap ikon. */
-const IKON_CUACA = {
-  cerah: `
-    <svg viewBox="0 0 100 100" width="76" height="76">
-      <defs>
-        <radialGradient id="gradMatahari" cx="38%" cy="35%">
-          <stop offset="0%" stop-color="#FFFBEB"/>
-          <stop offset="45%" stop-color="#FDE047"/>
-          <stop offset="100%" stop-color="#F59E0B"/>
-        </radialGradient>
-        <radialGradient id="glowMatahari" cx="50%" cy="50%">
-          <stop offset="0%" stop-color="#FDE047" stop-opacity="0.35"/>
-          <stop offset="100%" stop-color="#FDE047" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <circle cx="50" cy="50" r="46" fill="url(#glowMatahari)" class="cuaca-matahari-pulsa"/>
-      <g class="cuaca-matahari-putar">
-        <line x1="50" y1="4" x2="50" y2="17" stroke="#FBBF24" stroke-width="4.5" stroke-linecap="round"/>
-        <line x1="50" y1="83" x2="50" y2="96" stroke="#FBBF24" stroke-width="4.5" stroke-linecap="round"/>
-        <line x1="4" y1="50" x2="17" y2="50" stroke="#FBBF24" stroke-width="4.5" stroke-linecap="round"/>
-        <line x1="83" y1="50" x2="96" y2="50" stroke="#FBBF24" stroke-width="4.5" stroke-linecap="round"/>
-        <line x1="16" y1="16" x2="25" y2="25" stroke="#FDE047" stroke-width="4" stroke-linecap="round"/>
-        <line x1="75" y1="75" x2="84" y2="84" stroke="#FDE047" stroke-width="4" stroke-linecap="round"/>
-        <line x1="84" y1="16" x2="75" y2="25" stroke="#FDE047" stroke-width="4" stroke-linecap="round"/>
-        <line x1="25" y1="75" x2="16" y2="84" stroke="#FDE047" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="10" x2="50" y2="19" stroke="#FDE047" stroke-width="3" stroke-linecap="round" transform="rotate(22.5 50 50)"/>
-        <line x1="50" y1="10" x2="50" y2="19" stroke="#FDE047" stroke-width="3" stroke-linecap="round" transform="rotate(67.5 50 50)"/>
-        <line x1="50" y1="10" x2="50" y2="19" stroke="#FDE047" stroke-width="3" stroke-linecap="round" transform="rotate(112.5 50 50)"/>
-        <line x1="50" y1="10" x2="50" y2="19" stroke="#FDE047" stroke-width="3" stroke-linecap="round" transform="rotate(157.5 50 50)"/>
-      </g>
-      <circle cx="50" cy="50" r="21" fill="url(#gradMatahari)" class="cuaca-matahari-pulsa"/>
-      <circle cx="42" cy="43" r="5" fill="#FFFDF5" opacity="0.6"/>
-    </svg>`,
-  'cerah-berawan': `
-    <svg viewBox="0 0 100 100" width="72" height="72">
-      <defs>
-        <radialGradient id="gradMatahariKecil" cx="38%" cy="35%">
-          <stop offset="0%" stop-color="#FFFBEB"/>
-          <stop offset="45%" stop-color="#FDE047"/>
-          <stop offset="100%" stop-color="#F59E0B"/>
-        </radialGradient>
-      </defs>
-      <circle cx="62" cy="35" r="17" fill="url(#gradMatahariKecil)" class="cuaca-matahari-pulsa"/>
-      <g class="cuaca-awan-mengambang">
-        <ellipse cx="42" cy="62" rx="26" ry="16" fill="#CBD5E1"/>
-        <ellipse cx="60" cy="58" rx="18" ry="13" fill="#E2E8F0"/>
-      </g>
-    </svg>`,
-  berawan: `
-    <svg viewBox="0 0 100 100" width="72" height="72">
-      <g class="cuaca-awan-mengambang">
-        <ellipse cx="38" cy="55" rx="24" ry="15" fill="#94A3B8"/>
-        <ellipse cx="60" cy="50" rx="20" ry="16" fill="#CBD5E1"/>
-      </g>
-    </svg>`,
-  kabut: `
-    <svg viewBox="0 0 100 100" width="72" height="72">
-      <g stroke="#94A3B8" stroke-width="5" stroke-linecap="round" class="cuaca-kabut-pudar">
-        <line x1="15" y1="38" x2="85" y2="38"/>
-        <line x1="25" y1="52" x2="90" y2="52"/>
-        <line x1="10" y1="66" x2="75" y2="66"/>
-      </g>
-    </svg>`,
-  hujan: `
-    <svg viewBox="0 0 100 100" width="72" height="72">
-      <ellipse cx="50" cy="40" rx="28" ry="17" fill="#94A3B8"/>
-      <g stroke="#60A5FA" stroke-width="4" stroke-linecap="round" class="cuaca-hujan-jatuh">
-        <line x1="35" y1="62" x2="30" y2="78"/>
-        <line x1="50" y1="62" x2="45" y2="78"/>
-        <line x1="65" y1="62" x2="60" y2="78"/>
-      </g>
-    </svg>`,
-  salju: `
-    <svg viewBox="0 0 100 100" width="72" height="72">
-      <ellipse cx="50" cy="38" rx="28" ry="17" fill="#94A3B8"/>
-      <g fill="#F8FAFC" class="cuaca-salju-jatuh">
-        <circle cx="35" cy="64" r="3.5"/>
-        <circle cx="50" cy="70" r="3.5"/>
-        <circle cx="65" cy="64" r="3.5"/>
-      </g>
-    </svg>`,
-  badai: `
-    <svg viewBox="0 0 100 100" width="72" height="72">
-      <ellipse cx="50" cy="35" rx="28" ry="17" fill="#64748B"/>
-      <polygon points="52,50 40,72 48,72 44,90 62,64 52,64" fill="#FBBF24" class="cuaca-petir-kilat"/>
-    </svg>`
-};
 
 /** Menampilkan prakiraan cuaca TVRI Senayan — dipakai sebagai pengganti card
  *  "Agenda Berikutnya" saat memang tidak ada agenda berikutnya hari ini. */
@@ -282,7 +194,7 @@ function renderCuaca(content) {
 
   content.innerHTML = `
     <div class="flex items-center gap-4 h-full">
-      <div class="shrink-0">${IKON_CUACA[cuaca.ikon] || IKON_CUACA.berawan}</div>
+      <div class="shrink-0"><img src="${cuaca.urlIkon}" alt="${escapeHTML(cuaca.label)}" width="72" height="72" /></div>
       <div class="min-w-0">
         <p class="text-[11px] text-[#94A3B8] uppercase tracking-wide">Cuaca TVRI Senayan</p>
         <div class="flex items-baseline gap-2 mt-0.5">
