@@ -10,6 +10,7 @@ import { STATUS_COLOR_CLASS, STATUS_OTOMATIS } from '../config.js';
 import { escapeHTML, gabungTanggalJam, formatTanggalIndonesia } from '../utils.js';
 import { hitungStatusOtomatis, hitungCountdown, cariAgendaBerlangsung, cariAgendaBerikutnya } from '../statusEngine.js';
 import { hitungTanggalMendatang } from '../executiveMetrics.js';
+import { ambilCuacaTersimpan } from '../weatherService.js';
 import { $ } from './domHelpers.js';
 
 const BULAN_SINGKAT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -105,37 +106,24 @@ function tampilkanSlideStaf(content, slides, indeks) {
     </div>
   `;
 
-  const lapisanDepan = content.querySelector('[data-lapisan="depan"]');
-  const lapisanBelakang = content.querySelector('[data-lapisan="belakang"]');
-
-  if (!lapisanDepan || !lapisanBelakang) {
-    // Render pertama kali — belum ada lapisan sama sekali, siapkan strukturnya dulu.
-    // Dua <div> ditumpuk persis di posisi yang sama (position:absolute, inset:0);
-    // yang "depan" langsung terlihat (opacity:1), yang "belakang" tersembunyi (opacity:0),
-    // siap dipakai gantian di siklus berikutnya.
-    content.style.position = 'relative';
-    content.innerHTML = `
-      <div data-lapisan="depan" style="position:absolute; inset:0; opacity:1; transition:opacity 0.7s ease;">${htmlSlide}</div>
-      <div data-lapisan="belakang" style="position:absolute; inset:0; opacity:0; transition:opacity 0.7s ease;"></div>
-    `;
+  if (!content.dataset.karoselAktif) {
+    // Render pertama kali — langsung tampil tanpa transisi (belum ada apa pun yang
+    // perlu memudar-keluar dulu). Dibuat dalam alur dokumen NORMAL (bukan
+    // position:absolute) — supaya elemen ini selalu ikut memberi tinggi ke
+    // pembungkusnya sendiri, tidak bergantung ke tinggi yang diwarisi dari luar
+    // (posisi absolute pernah bikin kolaps/tidak kelihatan sama sekali di HP).
+    content.style.opacity = '1';
+    content.style.transition = 'opacity 0.5s ease';
+    content.innerHTML = htmlSlide;
+    content.dataset.karoselAktif = '1';
     return;
   }
 
-  // Dissolve sungguhan: isi lapisan belakang (tersembunyi) dengan slide baru, lalu
-  // KEDUA lapisan memudar BERSAMAAN — yang lama 1→0, yang baru 0→1 — sehingga sesaat
-  // dua-duanya tumpang tindih/berbaur, bukan sekadar menghilang-lalu-muncul berurutan.
-  lapisanBelakang.innerHTML = htmlSlide;
-  requestAnimationFrame(() => {
-    lapisanDepan.style.opacity = '0';
-    lapisanBelakang.style.opacity = '1';
-  });
-
-  // Setelah transisi selesai, tukar label "depan"/"belakang" supaya siklus berikutnya
-  // benar (yang baru saja jadi terlihat sekarang berperan sebagai "depan").
+  content.style.opacity = '0';
   setTimeout(() => {
-    lapisanDepan.setAttribute('data-lapisan', 'belakang');
-    lapisanBelakang.setAttribute('data-lapisan', 'depan');
-  }, 700);
+    content.innerHTML = htmlSlide;
+    requestAnimationFrame(() => { content.style.opacity = '1'; });
+  }, 400);
 }
 
 /** Menjalankan karosel profil staf (berputar tiap 10 detik) — dipanggil saat Agenda Hari Ini kosong. */
@@ -174,11 +162,113 @@ function hentikanKarouselStaf(content) {
     const judul = document.getElementById('judul-agenda-hari-ini');
     if (judul) judul.textContent = 'Agenda Hari Ini';
   }
-  // Bersihkan inline style — struktur 2-lapisan (position:relative, dst) khusus dipakai
-  // karosel staf, tidak relevan lagi begitu timeline agenda biasa yang dirender.
+  // Bersihkan inline style/dataset — khusus dipakai karosel staf, tidak relevan lagi
+  // begitu timeline agenda biasa yang dirender.
   if (content) {
-    content.style.position = '';
+    content.style.opacity = '';
+    content.style.transition = '';
+    delete content.dataset.karoselAktif;
   }
+}
+
+/** Ikon SVG animasi per jenis cuaca — animasinya didefinisikan lewat class CSS
+ *  (lihat index.html) supaya tidak perlu mengulang keyframes di tiap ikon. */
+const IKON_CUACA = {
+  cerah: `
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <g class="cuaca-matahari-putar">
+        <line x1="50" y1="8" x2="50" y2="20" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="80" x2="50" y2="92" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+        <line x1="8" y1="50" x2="20" y2="50" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+        <line x1="80" y1="50" x2="92" y2="50" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+        <line x1="19" y1="19" x2="27" y2="27" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+        <line x1="73" y1="73" x2="81" y2="81" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+        <line x1="81" y1="19" x2="73" y2="27" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+        <line x1="27" y1="73" x2="19" y2="81" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <circle cx="50" cy="50" r="20" fill="#FBBF24" class="cuaca-matahari-pulsa"/>
+    </svg>`,
+  'cerah-berawan': `
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <circle cx="62" cy="35" r="16" fill="#FBBF24" class="cuaca-matahari-pulsa"/>
+      <g class="cuaca-awan-mengambang">
+        <ellipse cx="42" cy="62" rx="26" ry="16" fill="#CBD5E1"/>
+        <ellipse cx="60" cy="58" rx="18" ry="13" fill="#E2E8F0"/>
+      </g>
+    </svg>`,
+  berawan: `
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <g class="cuaca-awan-mengambang">
+        <ellipse cx="38" cy="55" rx="24" ry="15" fill="#94A3B8"/>
+        <ellipse cx="60" cy="50" rx="20" ry="16" fill="#CBD5E1"/>
+      </g>
+    </svg>`,
+  kabut: `
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <g stroke="#94A3B8" stroke-width="5" stroke-linecap="round" class="cuaca-kabut-pudar">
+        <line x1="15" y1="38" x2="85" y2="38"/>
+        <line x1="25" y1="52" x2="90" y2="52"/>
+        <line x1="10" y1="66" x2="75" y2="66"/>
+      </g>
+    </svg>`,
+  hujan: `
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <ellipse cx="50" cy="40" rx="28" ry="17" fill="#94A3B8"/>
+      <g stroke="#60A5FA" stroke-width="4" stroke-linecap="round" class="cuaca-hujan-jatuh">
+        <line x1="35" y1="62" x2="30" y2="78"/>
+        <line x1="50" y1="62" x2="45" y2="78"/>
+        <line x1="65" y1="62" x2="60" y2="78"/>
+      </g>
+    </svg>`,
+  salju: `
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <ellipse cx="50" cy="38" rx="28" ry="17" fill="#94A3B8"/>
+      <g fill="#F8FAFC" class="cuaca-salju-jatuh">
+        <circle cx="35" cy="64" r="3.5"/>
+        <circle cx="50" cy="70" r="3.5"/>
+        <circle cx="65" cy="64" r="3.5"/>
+      </g>
+    </svg>`,
+  badai: `
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <ellipse cx="50" cy="35" rx="28" ry="17" fill="#64748B"/>
+      <polygon points="52,50 40,72 48,72 44,90 62,64 52,64" fill="#FBBF24" class="cuaca-petir-kilat"/>
+    </svg>`
+};
+
+/** Menampilkan prakiraan cuaca TVRI Senayan — dipakai sebagai pengganti card
+ *  "Agenda Berikutnya" saat memang tidak ada agenda berikutnya hari ini. */
+function renderCuaca(content) {
+  const cuaca = ambilCuacaTersimpan();
+  if (!cuaca) {
+    if (content.dataset.signature !== '') {
+      content.innerHTML = `<p class="text-body-elegant text-sm">Tidak ada agenda berikutnya hari ini.</p>`;
+      content.dataset.signature = '';
+    }
+    return;
+  }
+
+  // renderBerikutnya dipanggil tiap detik (untuk hitung mundur agenda) — tanpa
+  // penjagaan ini, ikon animasi cuaca akan di-rebuild ulang tiap detik juga,
+  // bikin animasinya "reset"/patah-patah tiap detik alih-alih mengalir mulus.
+  // Cuma render ulang kalau data cuaca-nya benar-benar berganti (tiap 10 menit).
+  const signature = 'cuaca-' + cuaca.diperbaruiPada.getTime();
+  if (content.dataset.signature === signature) return;
+  content.dataset.signature = signature;
+
+  content.innerHTML = `
+    <div class="flex items-center gap-4 h-full">
+      <div class="shrink-0">${IKON_CUACA[cuaca.ikon] || IKON_CUACA.berawan}</div>
+      <div class="min-w-0">
+        <p class="text-[11px] text-[#94A3B8] uppercase tracking-wide">Cuaca TVRI Senayan</p>
+        <div class="flex items-baseline gap-2 mt-0.5">
+          <span class="text-[28px] font-bold text-[#F8FAFC] leading-none">${cuaca.suhu}°</span>
+          <span class="text-[13px] text-[#CBD5E1]">${escapeHTML(cuaca.label)}</span>
+        </div>
+        <p class="text-[12px] text-[#64748B] mt-1">Terasa ${cuaca.terasaSeperti}° · Kelembapan ${cuaca.kelembapan}% · Angin ${cuaca.kecepatanAngin} km/j</p>
+      </div>
+    </div>
+  `;
 }
 
 export const AgendaRenderer = {
@@ -342,8 +432,7 @@ export const AgendaRenderer = {
     const [agenda] = cariAgendaBerikutnya(daftarAgenda, now, 1);
 
     if (!agenda) {
-      content.innerHTML = `<p class="text-body-elegant text-sm">Tidak ada agenda berikutnya hari ini.</p>`;
-      content.dataset.signature = '';
+      renderCuaca(content);
       return;
     }
 
