@@ -88,28 +88,43 @@
   }
   .fade-in { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
 
-  /* Kartu profil "Squad Pusdagi" — ukuran desktop/kiosk (default). Ditumpuk vertikal
-     dan diperkecil khusus di layar sempit lewat aturan mode HP di bawah. */
-  .kartu-staf { display: flex; height: 300px; max-width: 420px; }
-  .kartu-staf--besar { height: 360px; max-width: 520px; }
-  .kartu-staf-foto { width: 180px; height: 100%; }
-  .kartu-staf--besar .kartu-staf-foto { width: 220px; }
+  /* Animasi ikon cuaca (card "Agenda Berikutnya" saat kosong) */
+  @keyframes cuacaPutar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes cuacaPulsa { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: 0.85; } }
+  @keyframes cuacaMengambang { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+  @keyframes cuacaPudar { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+  @keyframes cuacaJatuh { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(14px); opacity: 0; } }
+  @keyframes cuacaKilat { 0%, 100% { opacity: 0; } 8%, 12% { opacity: 1; } 20% { opacity: 0; } }
 
-  /* Mode HP/tablet sempit — kartu ditumpuk vertikal (foto di atas, bukan di samping),
-     lebar & tinggi jadi otomatis mengikuti konten, bukan piksel tetap ala kiosk. */
+  .cuaca-matahari-putar { transform-origin: 50px 50px; animation: cuacaPutar 12s linear infinite; }
+  .cuaca-matahari-pulsa { animation: cuacaPulsa 2.5s ease-in-out infinite; transform-origin: 50px 50px; }
+  .cuaca-awan-mengambang { animation: cuacaMengambang 3.5s ease-in-out infinite; }
+  .cuaca-kabut-pudar line:nth-child(1) { animation: cuacaPudar 3s ease-in-out infinite; }
+  .cuaca-kabut-pudar line:nth-child(2) { animation: cuacaPudar 3s ease-in-out infinite 0.4s; }
+  .cuaca-kabut-pudar line:nth-child(3) { animation: cuacaPudar 3s ease-in-out infinite 0.8s; }
+  .cuaca-hujan-jatuh line:nth-child(1) { animation: cuacaJatuh 0.9s linear infinite; }
+  .cuaca-hujan-jatuh line:nth-child(2) { animation: cuacaJatuh 0.9s linear infinite 0.2s; }
+  .cuaca-hujan-jatuh line:nth-child(3) { animation: cuacaJatuh 0.9s linear infinite 0.4s; }
+  .cuaca-salju-jatuh circle:nth-child(1) { animation: cuacaJatuh 2.2s linear infinite; }
+  .cuaca-salju-jatuh circle:nth-child(2) { animation: cuacaJatuh 2.2s linear infinite 0.6s; }
+  .cuaca-salju-jatuh circle:nth-child(3) { animation: cuacaJatuh 2.2s linear infinite 1.2s; }
+  .cuaca-petir-kilat { animation: cuacaKilat 2.8s ease-in-out infinite; }
+
+  /* Kartu profil "Squad Pusdagi" — ukurannya FLUID (memakai clamp/min), otomatis
+     menyesuaikan lebar layar tanpa perlu media query terpisah. Ini sengaja dipilih
+     supaya tidak bergantung ke breakpoint tertentu yang mungkin bentrok dengan
+     aturan CSS lain di proyek ini yang tidak sepenuhnya saya tahu isinya. */
+  .slide-staf { flex-wrap: wrap; }
+  .kartu-staf { display: flex; width: min(420px, 100%); min-height: 180px; }
+  .kartu-staf--besar { width: min(520px, 100%); }
+  .kartu-staf-foto { width: clamp(90px, 30%, 220px); flex-shrink: 0; align-self: stretch; }
+
   @media (max-width: 768px) {
     /* Position:absolute (dipakai mekanisme dissolve karosel staf) tidak ikut memberi
        tinggi ke elemen pembungkusnya — tanpa ini, #agenda-hari-ini-content bisa
        kolaps ke tinggi 0 di mode HP (kontennya "ada" tapi tak kelihatan sama sekali). */
     #agenda-hari-ini-content { min-height: 420px !important; }
-
-    .slide-staf { flex-direction: column; gap: 20px !important; }
-    .kartu-staf, .kartu-staf--besar {
-      flex-direction: column; height: auto; max-width: 100%;
-    }
-    .kartu-staf-foto, .kartu-staf--besar .kartu-staf-foto {
-      width: 100%; height: 140px;
-    }
+    .slide-staf { height: auto !important; padding: 10px 0; }
   }
 
   #loading-screen {
