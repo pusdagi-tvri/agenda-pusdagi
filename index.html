@@ -88,27 +88,10 @@
   }
   .fade-in { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
 
-  /* Animasi ikon cuaca (card "Agenda Berikutnya" saat kosong) */
-  @keyframes cuacaPutar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  @keyframes cuacaPulsa { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: 0.85; } }
-  @keyframes cuacaMengambang { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
-  @keyframes cuacaPudar { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-  @keyframes cuacaJatuh { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(14px); opacity: 0; } }
-  @keyframes cuacaKilat { 0%, 100% { opacity: 0; } 8%, 12% { opacity: 1; } 20% { opacity: 0; } }
+  /* Ikon cuaca (card "Agenda Berikutnya" saat kosong) sekarang pakai <img> dari CDN
+     Meteocons (cdn.meteocons.com) — SVG animasinya sudah bawaan di file itu sendiri,
+     tidak perlu keyframes/class CSS buatan sendiri lagi di sini. */
 
-  .cuaca-matahari-putar { transform-origin: 50px 50px; animation: cuacaPutar 12s linear infinite; }
-  .cuaca-matahari-pulsa { animation: cuacaPulsa 2.5s ease-in-out infinite; transform-origin: 50px 50px; }
-  .cuaca-awan-mengambang { animation: cuacaMengambang 3.5s ease-in-out infinite; }
-  .cuaca-kabut-pudar line:nth-child(1) { animation: cuacaPudar 3s ease-in-out infinite; }
-  .cuaca-kabut-pudar line:nth-child(2) { animation: cuacaPudar 3s ease-in-out infinite 0.4s; }
-  .cuaca-kabut-pudar line:nth-child(3) { animation: cuacaPudar 3s ease-in-out infinite 0.8s; }
-  .cuaca-hujan-jatuh line:nth-child(1) { animation: cuacaJatuh 0.9s linear infinite; }
-  .cuaca-hujan-jatuh line:nth-child(2) { animation: cuacaJatuh 0.9s linear infinite 0.2s; }
-  .cuaca-hujan-jatuh line:nth-child(3) { animation: cuacaJatuh 0.9s linear infinite 0.4s; }
-  .cuaca-salju-jatuh circle:nth-child(1) { animation: cuacaJatuh 2.2s linear infinite; }
-  .cuaca-salju-jatuh circle:nth-child(2) { animation: cuacaJatuh 2.2s linear infinite 0.6s; }
-  .cuaca-salju-jatuh circle:nth-child(3) { animation: cuacaJatuh 2.2s linear infinite 1.2s; }
-  .cuaca-petir-kilat { animation: cuacaKilat 2.8s ease-in-out infinite; }
 
   /* Kartu profil "Squad Pusdagi" — ukurannya FLUID (memakai clamp/min), otomatis
      menyesuaikan lebar layar tanpa perlu media query terpisah. Ini sengaja dipilih
