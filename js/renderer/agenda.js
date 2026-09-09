@@ -175,22 +175,46 @@ function hentikanKarouselStaf(content) {
  *  (lihat index.html) supaya tidak perlu mengulang keyframes di tiap ikon. */
 const IKON_CUACA = {
   cerah: `
-    <svg viewBox="0 0 100 100" width="72" height="72">
+    <svg viewBox="0 0 100 100" width="76" height="76">
+      <defs>
+        <radialGradient id="gradMatahari" cx="38%" cy="35%">
+          <stop offset="0%" stop-color="#FFFBEB"/>
+          <stop offset="45%" stop-color="#FDE047"/>
+          <stop offset="100%" stop-color="#F59E0B"/>
+        </radialGradient>
+        <radialGradient id="glowMatahari" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="#FDE047" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#FDE047" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="46" fill="url(#glowMatahari)" class="cuaca-matahari-pulsa"/>
       <g class="cuaca-matahari-putar">
-        <line x1="50" y1="8" x2="50" y2="20" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
-        <line x1="50" y1="80" x2="50" y2="92" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
-        <line x1="8" y1="50" x2="20" y2="50" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
-        <line x1="80" y1="50" x2="92" y2="50" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
-        <line x1="19" y1="19" x2="27" y2="27" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
-        <line x1="73" y1="73" x2="81" y2="81" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
-        <line x1="81" y1="19" x2="73" y2="27" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
-        <line x1="27" y1="73" x2="19" y2="81" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="4" x2="50" y2="17" stroke="#FBBF24" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="50" y1="83" x2="50" y2="96" stroke="#FBBF24" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="4" y1="50" x2="17" y2="50" stroke="#FBBF24" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="83" y1="50" x2="96" y2="50" stroke="#FBBF24" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="16" y1="16" x2="25" y2="25" stroke="#FDE047" stroke-width="4" stroke-linecap="round"/>
+        <line x1="75" y1="75" x2="84" y2="84" stroke="#FDE047" stroke-width="4" stroke-linecap="round"/>
+        <line x1="84" y1="16" x2="75" y2="25" stroke="#FDE047" stroke-width="4" stroke-linecap="round"/>
+        <line x1="25" y1="75" x2="16" y2="84" stroke="#FDE047" stroke-width="4" stroke-linecap="round"/>
+        <line x1="50" y1="10" x2="50" y2="19" stroke="#FDE047" stroke-width="3" stroke-linecap="round" transform="rotate(22.5 50 50)"/>
+        <line x1="50" y1="10" x2="50" y2="19" stroke="#FDE047" stroke-width="3" stroke-linecap="round" transform="rotate(67.5 50 50)"/>
+        <line x1="50" y1="10" x2="50" y2="19" stroke="#FDE047" stroke-width="3" stroke-linecap="round" transform="rotate(112.5 50 50)"/>
+        <line x1="50" y1="10" x2="50" y2="19" stroke="#FDE047" stroke-width="3" stroke-linecap="round" transform="rotate(157.5 50 50)"/>
       </g>
-      <circle cx="50" cy="50" r="20" fill="#FBBF24" class="cuaca-matahari-pulsa"/>
+      <circle cx="50" cy="50" r="21" fill="url(#gradMatahari)" class="cuaca-matahari-pulsa"/>
+      <circle cx="42" cy="43" r="5" fill="#FFFDF5" opacity="0.6"/>
     </svg>`,
   'cerah-berawan': `
     <svg viewBox="0 0 100 100" width="72" height="72">
-      <circle cx="62" cy="35" r="16" fill="#FBBF24" class="cuaca-matahari-pulsa"/>
+      <defs>
+        <radialGradient id="gradMatahariKecil" cx="38%" cy="35%">
+          <stop offset="0%" stop-color="#FFFBEB"/>
+          <stop offset="45%" stop-color="#FDE047"/>
+          <stop offset="100%" stop-color="#F59E0B"/>
+        </radialGradient>
+      </defs>
+      <circle cx="62" cy="35" r="17" fill="url(#gradMatahariKecil)" class="cuaca-matahari-pulsa"/>
       <g class="cuaca-awan-mengambang">
         <ellipse cx="42" cy="62" rx="26" ry="16" fill="#CBD5E1"/>
         <ellipse cx="60" cy="58" rx="18" ry="13" fill="#E2E8F0"/>
