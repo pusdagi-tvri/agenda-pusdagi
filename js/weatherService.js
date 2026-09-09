@@ -12,44 +12,51 @@ const LATITUDE_TVRI = -6.2146;
 const LONGITUDE_TVRI = 106.8006;
 
 const URL_CUACA = `https://api.open-meteo.com/v1/forecast?latitude=${LATITUDE_TVRI}&longitude=${LONGITUDE_TVRI}` +
-  `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m` +
+  `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,is_day` +
   `&timezone=Asia%2FJakarta`;
 
-// Kode cuaca WMO (standar dipakai Open-Meteo) → { ikon, label }. Daftar lengkap:
-// https://open-meteo.com/en/docs — dipetakan ke salah satu dari 6 jenis ikon animasi.
+/** Base URL CDN resmi Meteocons (ikon animasi buatan Bas Milius, gratis & lisensi MIT):
+ *  https://meteocons.com — dipakai langsung sebagai <img src>, bukan digambar sendiri. */
+const CDN_METEOCONS = 'https://cdn.meteocons.com/latest/svg/fill';
+
+// Kode cuaca WMO (standar dipakai Open-Meteo) → { ikon, label }. "ikon" di sini adalah
+// SLUG resmi Meteocons (https://meteocons.com) — bukan nama buatan sendiri lagi.
+// Daftar kode WMO lengkap: https://open-meteo.com/en/docs
 const PETA_KODE_CUACA = {
-  0: { ikon: 'cerah', label: 'Cerah' },
-  1: { ikon: 'cerah-berawan', label: 'Cerah Berawan' },
-  2: { ikon: 'cerah-berawan', label: 'Cerah Berawan' },
-  3: { ikon: 'berawan', label: 'Berawan' },
-  45: { ikon: 'kabut', label: 'Berkabut' },
-  48: { ikon: 'kabut', label: 'Berkabut' },
-  51: { ikon: 'hujan', label: 'Gerimis Ringan' },
-  53: { ikon: 'hujan', label: 'Gerimis' },
-  55: { ikon: 'hujan', label: 'Gerimis Lebat' },
-  56: { ikon: 'hujan', label: 'Gerimis Beku' },
-  57: { ikon: 'hujan', label: 'Gerimis Beku Lebat' },
-  61: { ikon: 'hujan', label: 'Hujan Ringan' },
-  63: { ikon: 'hujan', label: 'Hujan' },
-  65: { ikon: 'hujan', label: 'Hujan Lebat' },
-  66: { ikon: 'hujan', label: 'Hujan Beku' },
-  67: { ikon: 'hujan', label: 'Hujan Beku Lebat' },
-  71: { ikon: 'salju', label: 'Salju Ringan' },
-  73: { ikon: 'salju', label: 'Salju' },
-  75: { ikon: 'salju', label: 'Salju Lebat' },
-  77: { ikon: 'salju', label: 'Butiran Salju' },
-  80: { ikon: 'hujan', label: 'Hujan Ringan' },
-  81: { ikon: 'hujan', label: 'Hujan' },
-  82: { ikon: 'hujan', label: 'Hujan Sangat Lebat' },
-  85: { ikon: 'salju', label: 'Hujan Salju Ringan' },
-  86: { ikon: 'salju', label: 'Hujan Salju Lebat' },
-  95: { ikon: 'badai', label: 'Badai Petir' },
-  96: { ikon: 'badai', label: 'Badai Petir + Hujan Es' },
-  99: { ikon: 'badai', label: 'Badai Petir + Hujan Es Lebat' }
+  0: { ikon: 'clear-day', ikonMalam: 'clear-night', label: 'Cerah' },
+  1: { ikon: 'partly-cloudy-day', ikonMalam: 'partly-cloudy-night', label: 'Cerah Berawan' },
+  2: { ikon: 'partly-cloudy-day', ikonMalam: 'partly-cloudy-night', label: 'Cerah Berawan' },
+  3: { ikon: 'cloudy', label: 'Berawan' },
+  45: { ikon: 'fog', label: 'Berkabut' },
+  48: { ikon: 'fog', label: 'Berkabut' },
+  51: { ikon: 'drizzle', label: 'Gerimis Ringan' },
+  53: { ikon: 'drizzle', label: 'Gerimis' },
+  55: { ikon: 'drizzle', label: 'Gerimis Lebat' },
+  56: { ikon: 'drizzle', label: 'Gerimis Beku' },
+  57: { ikon: 'drizzle', label: 'Gerimis Beku Lebat' },
+  61: { ikon: 'rain', label: 'Hujan Ringan' },
+  63: { ikon: 'rain', label: 'Hujan' },
+  65: { ikon: 'rain', label: 'Hujan Lebat' },
+  66: { ikon: 'rain', label: 'Hujan Beku' },
+  67: { ikon: 'rain', label: 'Hujan Beku Lebat' },
+  71: { ikon: 'snow', label: 'Salju Ringan' },
+  73: { ikon: 'snow', label: 'Salju' },
+  75: { ikon: 'snow', label: 'Salju Lebat' },
+  77: { ikon: 'snow', label: 'Butiran Salju' },
+  80: { ikon: 'rain', label: 'Hujan Ringan' },
+  81: { ikon: 'rain', label: 'Hujan' },
+  82: { ikon: 'rain', label: 'Hujan Sangat Lebat' },
+  85: { ikon: 'snow', label: 'Hujan Salju Ringan' },
+  86: { ikon: 'snow', label: 'Hujan Salju Lebat' },
+  95: { ikon: 'thunderstorms', label: 'Badai Petir' },
+  96: { ikon: 'thunderstorms-extreme', label: 'Badai Petir + Hujan Es' },
+  99: { ikon: 'thunderstorms-extreme', label: 'Badai Petir + Hujan Es Lebat' }
 };
 
-function petakanKodeCuaca(kode) {
-  return PETA_KODE_CUACA[kode] || { ikon: 'berawan', label: '-' };
+function petakanKodeCuaca(kode, siangHari) {
+  const info = PETA_KODE_CUACA[kode] || { ikon: 'cloudy', label: '-' };
+  const ikon = (!siangHari && info.ikonMalam) ? info.ikonMalam : info.ikon;
+  return { ikon, label: info.label };
 }
 
 let cuacaTerakhir = null; // cache di memori, dibaca renderer tanpa perlu fetch ulang tiap render
@@ -61,14 +68,14 @@ async function ambilCuacaTerbaru() {
     if (!response.ok) throw new Error('Respons cuaca tidak OK: ' + response.status);
     const data = await response.json();
     const c = data.current;
-    const info = petakanKodeCuaca(c.weather_code);
+    const info = petakanKodeCuaca(c.weather_code, c.is_day === 1);
 
     cuacaTerakhir = {
       suhu: Math.round(c.temperature_2m),
       terasaSeperti: Math.round(c.apparent_temperature),
       kelembapan: Math.round(c.relative_humidity_2m),
       kecepatanAngin: Math.round(c.wind_speed_10m),
-      ikon: info.ikon,
+      urlIkon: `${CDN_METEOCONS}/${info.ikon}.svg`,
       label: info.label,
       diperbaruiPada: new Date()
     };
