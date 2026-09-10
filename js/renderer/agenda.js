@@ -194,7 +194,7 @@ function renderCuaca(content) {
 
   content.innerHTML = `
     <div class="flex items-center gap-4 h-full">
-      <div class="shrink-0"><img src="${cuaca.urlIkon}" alt="${escapeHTML(cuaca.label)}" width="72" height="72" /></div>
+      <div class="shrink-0"><img src="${cuaca.urlIkon}" alt="${escapeHTML(cuaca.label)}" width="96" height="96" /></div>
       <div class="min-w-0">
         <p class="text-[11px] text-[#94A3B8] uppercase tracking-wide">Cuaca TVRI Senayan</p>
         <div class="flex items-baseline gap-2 mt-0.5">
