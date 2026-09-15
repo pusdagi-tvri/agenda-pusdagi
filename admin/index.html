@@ -393,8 +393,9 @@
           </div>
           <div class="space-y-4">
             <div>
-              <label for="form-catatan">Catatan</label>
-              <textarea id="form-catatan" rows="2"></textarea>
+              <label for="form-berkas">Berkas Undangan <span class="text-caption normal-case tracking-normal text-[12px]">(PDF atau gambar, opsional)</span></label>
+              <input id="form-berkas" type="file" accept="application/pdf,image/*" />
+              <p id="berkas-saat-ini" class="text-[12px] text-[#94A3B8] mt-1.5"></p>
             </div>
             <div>
               <label for="form-notulen">Notulen <span class="text-caption normal-case tracking-normal text-[12px]">(diisi setelah rapat selesai)</span></label>
