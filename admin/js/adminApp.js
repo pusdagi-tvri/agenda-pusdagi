@@ -49,6 +49,22 @@ async function tanganiSubmitForm(e) {
   const data = AdminRenderer.ambilDataForm();
   const { id_agenda, ...payload } = data;
 
+  // Berkas ditangani terpisah dari field lain (butuh proses upload sendiri via
+  // form multipart) — kalau admin pilih file baru, upload dulu & catat fileKey-nya;
+  // kalau tidak pilih file baru (mis. lagi edit, tidak mau ganti), pakai fileKey
+  // yang sudah ada sebelumnya (disimpan di dataset.existing saat isiFormUntukEdit).
+  const inputBerkas = document.getElementById('form-berkas');
+  const fileBaru = inputBerkas.files[0];
+
+  if (fileBaru) {
+    AdminRenderer.tampilkanPesan('sukses', 'Mengunggah berkas…');
+    const fileKey = `berkas_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    await AdminApiService.uploadBerkas(fileKey, inputBerkas);
+    payload.berkas = fileKey; // ekstensi ditentukan & ditambahkan otomatis di backend
+  } else {
+    payload.berkas = inputBerkas.dataset.existing || '';
+  }
+
   AdminRenderer.tampilkanPesan('sukses', 'Agenda dikirim, memuat ulang daftar…');
 
   if (id_agenda) {

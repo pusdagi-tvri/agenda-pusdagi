@@ -87,7 +87,9 @@ export const AdminRenderer = {
     $('form-prioritas').value = agenda.prioritas || 'Sedang';
     $('form-peserta').value = agenda.peserta || '';
     $('form-penyelenggara').value = agenda.penyelenggara || '';
-    $('form-catatan').value = agenda.catatan || '';
+    $('form-berkas').value = ''; // input file tidak bisa diisi programatis — kosongkan, biarkan admin pilih file baru kalau mau ganti
+    $('form-berkas').dataset.existing = agenda.berkas || ''; // dipakai ambilDataForm kalau tidak ada file baru dipilih
+    $('berkas-saat-ini').textContent = agenda.berkas ? `Berkas saat ini: ${agenda.berkas} (pilih file baru untuk mengganti, atau biarkan kosong untuk tetap pakai ini)` : '';
     $('form-notulen').value = agenda.notulen || '';
     $('form-judul-panel').textContent = 'Edit Agenda';
     $('form-tombol-submit').textContent = 'Simpan Perubahan';
@@ -96,6 +98,8 @@ export const AdminRenderer = {
   resetForm() {
     $('form-agenda').reset();
     $('form-id-agenda').value = '';
+    $('form-berkas').dataset.existing = '';
+    $('berkas-saat-ini').textContent = '';
     $('form-judul-panel').textContent = 'Tambah Agenda Baru';
     $('form-tombol-submit').textContent = 'Simpan Agenda';
   },
@@ -116,7 +120,6 @@ export const AdminRenderer = {
       prioritas: $('form-prioritas').value,
       peserta: $('form-peserta').value.trim(),
       penyelenggara: $('form-penyelenggara').value.trim(),
-      catatan: $('form-catatan').value.trim(),
       notulen: $('form-notulen').value.trim()
     };
   },

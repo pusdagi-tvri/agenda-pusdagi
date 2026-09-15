@@ -19,6 +19,59 @@ import { AdminAuth } from './adminAuth.js';
  * Jadi fungsi ini "fire and forget" — sukses/gagalnya baru bisa dipastikan
  * dengan memuat ulang daftar agenda setelah beberapa saat.
  */
+/**
+ * Mengunggah file (dari <input type="file"> ASLI, bukan dibuat ulang — browser
+ * tidak mengizinkan file di-set programatis ke input baru) lewat form multipart
+ * sementara, dikirim ke iframe tersembunyi yang sama seperti kirimForm(). Elemen
+ * file input aslinya DIPINDAH sementara ke form ini lalu DIKEMBALIKAN ke posisi
+ * semula setelah selesai, supaya tampilan form utama tidak berubah.
+ */
+function uploadBerkas(fileKey, inputFileAsli) {
+  return new Promise((resolve) => {
+    const url = `${CONFIG.API_BASE_URL}?key=${encodeURIComponent(AdminAuth.ambilToken())}`;
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = url;
+    form.target = 'admin-write-target';
+    form.enctype = 'multipart/form-data';
+    form.style.display = 'none';
+
+    const inputAction = document.createElement('input');
+    inputAction.type = 'hidden';
+    inputAction.name = 'action';
+    inputAction.value = 'uploadBerkas';
+    form.appendChild(inputAction);
+
+    const inputKey = document.createElement('input');
+    inputKey.type = 'hidden';
+    inputKey.name = 'fileKey';
+    inputKey.value = fileKey;
+    form.appendChild(inputKey);
+
+    // Pindahkan SEMENTARA elemen file input asli ke form ini — penanda komentar
+    // dipakai supaya tahu persis di mana harus mengembalikannya nanti.
+    const indukAsli = inputFileAsli.parentNode;
+    const penanda = document.createComment('posisi-asli-form-berkas');
+    indukAsli.insertBefore(penanda, inputFileAsli);
+    const namaAsli = inputFileAsli.name;
+    inputFileAsli.name = 'berkas';
+    form.appendChild(inputFileAsli);
+
+    document.body.appendChild(form);
+    form.submit();
+
+    setTimeout(() => {
+      // Kembalikan file input ke posisi & nama semula di form utama.
+      indukAsli.insertBefore(inputFileAsli, penanda);
+      indukAsli.removeChild(penanda);
+      inputFileAsli.name = namaAsli;
+      document.body.removeChild(form);
+      resolve();
+    }, 3000);
+  });
+}
+
 function kirimForm(bodyObject) {
   return new Promise((resolve) => {
     const url = `${CONFIG.API_BASE_URL}?key=${encodeURIComponent(AdminAuth.ambilToken())}`;
@@ -76,6 +129,10 @@ async function permintaan(path, opsi) {
 }
 
 export const AdminApiService = {
+  uploadBerkas(fileKey, inputFileAsli) {
+    return uploadBerkas(fileKey, inputFileAsli);
+  },
+
   /**
    * Satu-satunya sumber data baca untuk Admin Panel — SEMUA lewat /dashboard.
    * Endpoint /agenda dan /pimpinan, /ruangan langsung TIDAK dipakai lagi karena
