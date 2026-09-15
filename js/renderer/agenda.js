@@ -6,7 +6,7 @@
  * ============================================================
  */
 
-import { STATUS_COLOR_CLASS, STATUS_OTOMATIS } from '../config.js';
+import { STATUS_COLOR_CLASS, STATUS_OTOMATIS, CONFIG } from '../config.js';
 import { escapeHTML, gabungTanggalJam, formatTanggalIndonesia } from '../utils.js';
 import { hitungStatusOtomatis, hitungCountdown, cariAgendaBerlangsung, cariAgendaBerikutnya } from '../statusEngine.js';
 import { hitungTanggalMendatang } from '../executiveMetrics.js';
@@ -253,15 +253,17 @@ export const AgendaRenderer = {
       const warnaBadge = STATUS_COLOR_CLASS[status];
 
       const multiHari = a.tanggal_selesai && a.tanggal_selesai !== a.tanggal;
+      const urlBerkas = a.berkas ? `${CONFIG.API_BASE_URL}/unduh-berkas?berkasKey=${encodeURIComponent(a.berkas)}&key=${encodeURIComponent(CONFIG.API_TOKEN)}` : '';
 
       return `
         <div class="timeline-row" style="margin-bottom:22px;">
           <span class="timeline-dot ${aktifBerlangsung ? 'animate-pulse-ring' : ''}" style="background:${warnaHex}"></span>
-          <div class="${aktifBerlangsung ? 'rounded-xl p-3' : ''}" ${aktifBerlangsung ? 'style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25);"' : ''}>
+          <div class="${aktifBerlangsung ? 'rounded-xl p-3' : ''} ${a.berkas ? 'cursor-pointer hover-brighten' : ''}" ${aktifBerlangsung ? 'style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25);"' : ''} ${a.berkas ? `onclick="window.open('${urlBerkas}', '_blank')" title="Klik untuk buka berkas undangan"` : ''}>
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">
                 <span class="text-[13px] font-semibold" style="color:${warnaHex}">${a.jam_mulai}</span>
                 ${multiHari ? `<span class="text-[11px] font-medium ml-2 px-2 py-0.5 rounded-full" style="background:rgba(139,92,246,0.15); color:#A78BFA;">s/d ${formatTanggalSingkat(a.tanggal_selesai)}</span>` : ''}
+                ${a.berkas ? `<span class="text-[11px] font-medium ml-2 px-2 py-0.5 rounded-full inline-flex items-center gap-1" style="background:rgba(37,99,235,0.15); color:#60A5FA;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Berkas</span>` : ''}
                 <h3 class="text-[17px] font-semibold text-[#F8FAFC] truncate mt-0.5">${escapeHTML(a.judul_kegiatan)}</h3>
                 ${a.penyelenggara ? `<p class="text-[13px] text-[#94A3B8] truncate mt-0.5">Penyelenggara: ${escapeHTML(a.penyelenggara)}</p>` : ''}
                 <p class="text-[13px] text-[#94A3B8] truncate mt-0.5">${escapeHTML(a.ruanganTampilan) || '-'}${a.pimpinanTampilan ? ' · ' + escapeHTML(a.pimpinanTampilan) : ''}</p>
