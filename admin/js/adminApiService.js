@@ -26,49 +26,31 @@ import { AdminAuth } from './adminAuth.js';
  * file input aslinya DIPINDAH sementara ke form ini lalu DIKEMBALIKAN ke posisi
  * semula setelah selesai, supaya tampilan form utama tidak berubah.
  */
+/**
+ * Membaca file jadi base64 (FileReader — di browser, bukan di server), lalu kirim
+ * lewat kirimForm() yang SAMA seperti operasi tulis lain (JSON biasa via hidden
+ * iframe). TIDAK lagi lewat file upload asli/multipart — cara itu tidak terbukti
+ * bisa diandalkan untuk diterima Google Apps Script Web App dengan benar.
+ */
 function uploadBerkas(fileKey, inputFileAsli) {
-  return new Promise((resolve) => {
-    const url = `${CONFIG.API_BASE_URL}?key=${encodeURIComponent(AdminAuth.ambilToken())}`;
+  return new Promise((resolve, reject) => {
+    const file = inputFileAsli.files[0];
+    if (!file) { resolve(); return; }
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = url;
-    form.target = 'admin-write-target';
-    form.enctype = 'multipart/form-data';
-    form.style.display = 'none';
-
-    const inputAction = document.createElement('input');
-    inputAction.type = 'hidden';
-    inputAction.name = 'action';
-    inputAction.value = 'uploadBerkas';
-    form.appendChild(inputAction);
-
-    const inputKey = document.createElement('input');
-    inputKey.type = 'hidden';
-    inputKey.name = 'fileKey';
-    inputKey.value = fileKey;
-    form.appendChild(inputKey);
-
-    // Pindahkan SEMENTARA elemen file input asli ke form ini — penanda komentar
-    // dipakai supaya tahu persis di mana harus mengembalikannya nanti.
-    const indukAsli = inputFileAsli.parentNode;
-    const penanda = document.createComment('posisi-asli-form-berkas');
-    indukAsli.insertBefore(penanda, inputFileAsli);
-    const namaAsli = inputFileAsli.name;
-    inputFileAsli.name = 'berkas';
-    form.appendChild(inputFileAsli);
-
-    document.body.appendChild(form);
-    form.submit();
-
-    setTimeout(() => {
-      // Kembalikan file input ke posisi & nama semula di form utama.
-      indukAsli.insertBefore(inputFileAsli, penanda);
-      indukAsli.removeChild(penanda);
-      inputFileAsli.name = namaAsli;
-      document.body.removeChild(form);
-      resolve();
-    }, 3000);
+    const reader = new FileReader();
+    reader.onload = () => {
+      // reader.result formatnya "data:mime/type;base64,XXXXX" — ambil bagian base64-nya saja
+      const base64Murni = reader.result.split(',')[1];
+      kirimForm({
+        action: 'uploadBerkas',
+        fileKey: fileKey,
+        base64: base64Murni,
+        mimeType: file.type,
+        namaAsli: file.name
+      }).then(resolve);
+    };
+    reader.onerror = () => reject(new Error('Gagal membaca file di browser.'));
+    reader.readAsDataURL(file);
   });
 }
 
