@@ -57,9 +57,11 @@ async function tanganiSubmitForm(e) {
   const fileBaru = inputBerkas.files[0];
 
   if (fileBaru) {
-    AdminRenderer.tampilkanPesan('sukses', 'Mengunggah berkas…');
+    AdminRenderer.tampilkanPesan('sukses', `Membaca file "${fileBaru.name}" (${fileBaru.size} bytes)…`);
     const fileKey = `berkas_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     await AdminApiService.uploadBerkas(fileKey, inputBerkas);
+    AdminRenderer.tampilkanPesan('sukses', `Berkas terkirim dengan fileKey: ${fileKey}`);
+    await new Promise((r) => setTimeout(r, 1500)); // beri waktu pesan di atas terbaca dulu
     payload.berkas = fileKey; // ekstensi ditentukan & ditambahkan otomatis di backend
   } else {
     payload.berkas = inputBerkas.dataset.existing || '';

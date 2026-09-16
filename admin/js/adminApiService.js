@@ -41,6 +41,7 @@ function uploadBerkas(fileKey, inputFileAsli) {
     reader.onload = () => {
       // reader.result formatnya "data:mime/type;base64,XXXXX" — ambil bagian base64-nya saja
       const base64Murni = reader.result.split(',')[1];
+      console.log('[uploadBerkas] fileKey=' + fileKey + ', namaFile=' + file.name + ', mimeType=' + file.type + ', panjang base64=' + base64Murni.length + ' karakter');
       kirimForm({
         action: 'uploadBerkas',
         fileKey: fileKey,
