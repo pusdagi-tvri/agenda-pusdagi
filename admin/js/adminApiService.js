@@ -56,6 +56,9 @@ function uploadBerkas(fileKey, inputFileAsli) {
 }
 
 function kirimForm(bodyObject) {
+  const ringkas = Object.assign({}, bodyObject);
+  if (ringkas.base64) ringkas.base64 = `(${ringkas.base64.length} karakter, disingkat)`;
+  console.log('[kirimForm] action=' + bodyObject.action + ', isi=' + JSON.stringify(ringkas));
   return new Promise((resolve) => {
     const url = `${CONFIG.API_BASE_URL}?key=${encodeURIComponent(AdminAuth.ambilToken())}`;
 

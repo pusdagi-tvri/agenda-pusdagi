@@ -68,6 +68,7 @@ async function tanganiSubmitForm(e) {
   }
 
   AdminRenderer.tampilkanPesan('sukses', 'Agenda dikirim, memuat ulang daftar…');
+  console.log('[tanganiSubmitForm] mode=' + (id_agenda ? 'UPDATE id=' + id_agenda : 'CREATE') + ', payload.berkas=' + payload.berkas + ', payload lengkap=' + JSON.stringify(payload));
 
   if (id_agenda) {
     await AdminApiService.updateAgenda(id_agenda, payload);
