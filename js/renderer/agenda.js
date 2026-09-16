@@ -438,8 +438,9 @@ export const AgendaRenderer = {
 
     const buatKartu = (a, versiModal = false) => {
       const prioritas = a.prioritas || 'Sedang';
+      const urlBerkas = a.berkas ? `${CONFIG.API_BASE_URL}/unduh-berkas?berkasKey=${encodeURIComponent(a.berkas)}&key=${encodeURIComponent(CONFIG.API_TOKEN)}` : '';
       return `
-        <div class="${versiModal ? '' : 'flex-1 min-w-0'} rounded-2xl bg-white/[0.03] border border-white/10 p-4 flex flex-col">
+        <div class="${versiModal ? '' : 'flex-1 min-w-0'} rounded-2xl bg-white/[0.03] border border-white/10 p-4 flex flex-col ${a.berkas ? 'cursor-pointer hover-brighten' : ''}" ${a.berkas ? `onclick="window.open('${urlBerkas}', '_blank')"` : ''}>
           <div class="flex items-center gap-2 mb-2">
             <span class="w-2 h-2 rounded-full shrink-0" style="background:${DOT_PRIORITAS[prioritas] || '#94A3B8'}"></span>
             <span class="text-[13px] font-medium truncate" style="color:${DOT_PRIORITAS[prioritas] || '#94A3B8'}">${labelHariRelatif(a.tanggal, now)}</span>
