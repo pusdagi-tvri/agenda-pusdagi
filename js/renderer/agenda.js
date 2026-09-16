@@ -263,7 +263,6 @@ export const AgendaRenderer = {
               <div class="min-w-0">
                 <span class="text-[13px] font-semibold" style="color:${warnaHex}">${a.jam_mulai}</span>
                 ${multiHari ? `<span class="text-[11px] font-medium ml-2 px-2 py-0.5 rounded-full" style="background:rgba(139,92,246,0.15); color:#A78BFA;">s/d ${formatTanggalSingkat(a.tanggal_selesai)}</span>` : ''}
-                ${a.berkas ? `<span class="text-[11px] font-medium ml-2 px-2 py-0.5 rounded-full inline-flex items-center gap-1" style="background:rgba(37,99,235,0.15); color:#60A5FA;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Berkas</span>` : ''}
                 <h3 class="text-[17px] font-semibold text-[#F8FAFC] truncate mt-0.5">${escapeHTML(a.judul_kegiatan)}</h3>
                 ${a.penyelenggara ? `<p class="text-[13px] text-[#94A3B8] truncate mt-0.5">Penyelenggara: ${escapeHTML(a.penyelenggara)}</p>` : ''}
                 <p class="text-[13px] text-[#94A3B8] truncate mt-0.5">${escapeHTML(a.ruanganTampilan) || '-'}${a.pimpinanTampilan ? ' · ' + escapeHTML(a.pimpinanTampilan) : ''}</p>
