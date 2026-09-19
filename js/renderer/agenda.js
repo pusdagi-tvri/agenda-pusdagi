@@ -48,9 +48,9 @@ function buatSlideStaf(daftarStaf) {
   const stafLain = daftarStaf.filter((s) => s !== kapusdagi);
   const slides = [];
   if (kapusdagi) slides.push([kapusdagi]);
-  for (let i = 0; i < stafLain.length; i += 2) {
-    slides.push(stafLain.slice(i, i + 2));
-  }
+  // Satu orang per slide (bukan berpasangan) — supaya kartu tidak pernah perlu
+  // ditumpuk atas-bawah di layar sempit, apa pun ukurannya.
+  stafLain.forEach((s) => slides.push([s]));
   return slides;
 }
 
