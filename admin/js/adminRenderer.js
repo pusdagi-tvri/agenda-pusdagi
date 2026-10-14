@@ -159,7 +159,7 @@ export const AdminRenderer = {
     });
   },
 
-  tampilkanPesan(tipe, teks) {
+  tampilkanPesan(tipe, teks, durasi = 5000) {
     const el = $('pesan-panel');
     const warna = tipe === 'error'
       ? 'background:rgba(239,68,68,0.14); color:#FCA5A5; border:1px solid rgba(239,68,68,0.3);'
@@ -167,7 +167,7 @@ export const AdminRenderer = {
     el.style.cssText = warna;
     el.textContent = teks;
     el.classList.remove('hidden');
-    setTimeout(() => el.classList.add('hidden'), 5000);
+    setTimeout(() => el.classList.add('hidden'), durasi);
   },
 
   tampilkanErrorLogin(teks) {

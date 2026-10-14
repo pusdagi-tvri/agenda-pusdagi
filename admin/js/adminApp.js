@@ -44,10 +44,55 @@ function batalkanAgenda(agenda) {
   tombolTutup.addEventListener('click', tutup);
 }
 
+let agendaTermuat = []; // salinan daftar agenda terakhir dari server — dipakai cek bentrok sebelum kirim
+
+const potongJam = (j) => String(j || '').slice(0, 5);
+const potongTanggal = (t) => String(t || '').slice(0, 10);
+
+/**
+ * Meniru aturan server (cariBentrokJadwal): bentrok kalau ada agenda aktif (bukan Batal)
+ * dengan teks lokasi PERSIS sama, di tanggal mulai yang sama, dan jamnya tumpang tindih.
+ * Dicek di sini karena pengiriman lewat form tersembunyi tidak bisa membaca penolakan server.
+ * Server tetap jadi penentu akhir; ini cuma supaya admin langsung diberi tahu.
+ */
+function cariBentrokDiDaftar(data, idDikecualikan) {
+  const mulaiBaru = potongJam(data.jam_mulai);
+  const selesaiBaru = potongJam(data.jam_selesai);
+  return agendaTermuat.find((a) => {
+    if (a.status === 'Batal') return false;
+    if (idDikecualikan && a.id_agenda === idDikecualikan) return false;
+    if (a.id_ruangan !== data.id_ruangan || potongTanggal(a.tanggal) !== potongTanggal(data.tanggal)) return false;
+    return mulaiBaru < potongJam(a.jam_selesai) && selesaiBaru > potongJam(a.jam_mulai);
+  }) || null;
+}
+
+/** Saat edit, server cuma mengecek bentrok kalau tanggal/jam/lokasi berubah — samakan di sini. */
+function perluCekBentrok(data) {
+  if (!data.id_agenda) return true;
+  const lama = agendaTermuat.find((a) => a.id_agenda === data.id_agenda);
+  if (!lama) return true;
+  return !(potongTanggal(lama.tanggal) === potongTanggal(data.tanggal)
+    && potongJam(lama.jam_mulai) === potongJam(data.jam_mulai)
+    && potongJam(lama.jam_selesai) === potongJam(data.jam_selesai)
+    && lama.id_ruangan === data.id_ruangan);
+}
+
 async function tanganiSubmitForm(e) {
   e.preventDefault();
   const data = AdminRenderer.ambilDataForm();
   const { id_agenda, ...payload } = data;
+
+  if (perluCekBentrok(data)) {
+    const bentrok = cariBentrokDiDaftar(data, id_agenda);
+    if (bentrok) {
+      AdminRenderer.tampilkanPesan(
+        'error',
+        `Jadwal bentrok, agenda belum disimpan. Sudah ada "${bentrok.judul_kegiatan}" di ${bentrok.id_ruangan} pada ${formatTanggalID(bentrok.tanggal)}, ${potongJam(bentrok.jam_mulai)}-${potongJam(bentrok.jam_selesai)}. Ubah lokasi atau jam, lalu simpan lagi.`,
+        10000
+      );
+      return;
+    }
+  }
 
   // Berkas ditangani terpisah dari field lain (butuh proses upload sendiri via
   // form multipart) — kalau admin pilih file baru, upload dulu & catat fileKey-nya;
@@ -78,9 +123,30 @@ async function tanganiSubmitForm(e) {
 
   AdminRenderer.resetForm();
   await muatData();
-  // Catatan: karena pengiriman lewat form (bukan fetch), validasi bentrok jadwal
-  // dari server tidak bisa dibaca langsung di sini — cek daftar di bawah untuk
-  // memastikan agenda benar-benar tersimpan sesuai yang diharapkan.
+
+  // Pengiriman lewat form tidak bisa membaca balasan server, jadi untuk agenda BARU kita
+  // cek sendiri apakah benar muncul di daftar (tunggu sebentar kalau server belum selesai).
+  // Kalau tetap tidak muncul, kemungkinan server menolaknya (bentrok yang tidak terlihat
+  // di daftar ini, atau data tidak lengkap) — beri tahu admin, jangan diam saja.
+  if (!id_agenda) {
+    const adaDiDaftar = () => agendaTermuat.some((a) =>
+      a.judul_kegiatan === payload.judul_kegiatan
+      && potongTanggal(a.tanggal) === potongTanggal(payload.tanggal)
+      && potongJam(a.jam_mulai) === potongJam(payload.jam_mulai));
+    if (!adaDiDaftar()) {
+      await new Promise((r) => setTimeout(r, 4000));
+      await muatData();
+    }
+    if (adaDiDaftar()) {
+      AdminRenderer.tampilkanPesan('sukses', 'Agenda tersimpan.');
+    } else {
+      AdminRenderer.tampilkanPesan(
+        'error',
+        'Agenda belum muncul di daftar, kemungkinan ditolak server (mis. bentrok jadwal atau data belum lengkap). Periksa daftar agenda lalu coba simpan lagi.',
+        10000
+      );
+    }
+  }
 }
 
 let arsipLengkap = []; // disimpan supaya pencarian bisa filter tanpa fetch ulang ke server
@@ -90,6 +156,7 @@ async function muatData() {
   const { pimpinan, ruangan, agenda, arsip, kecepatanTeks } = await AdminApiService.ambilRingkasan();
   AdminRenderer.isiDatalist('datalist-pimpinan', pimpinan, 'nama_lengkap');
   AdminRenderer.isiDatalist('datalist-ruangan', ruangan, 'nama_ruangan');
+  agendaTermuat = agenda;
   AdminRenderer.renderDaftarAgenda(agenda, mulaiEdit, batalkanAgenda);
 
   // Jangan timpa kalau field-nya sedang aktif diketik (fokus) — hindari mengganggu input berjalan.
